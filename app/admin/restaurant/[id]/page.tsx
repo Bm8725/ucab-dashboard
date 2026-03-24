@@ -78,9 +78,9 @@ export default function RestaurantLiveDash() {
       time: date.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }),
       day: date.toLocaleDateString('ro-RO', { day: '2-digit', month: 'short' })
     };
-  };
+  }; 
 
-  if (loading) return <div className="h-screen bg-[#FDFCF7] flex items-center justify-center font-black italic text-red-600 tracking-[0.5em]">UCAB FOOD SYNC...</div>;
+  if (loading) return <div className="h-screen bg-[#FDFCF7] flex items-center justify-center font-black italic text-red-600 tracking-[0.5em]">UCAB-FOOD loading...</div>;
 
   return (
     <div className="min-h-screen bg-[#FDFCF7] text-zinc-900 p-6 md:p-12 font-sans italic uppercase font-black">
@@ -89,9 +89,9 @@ export default function RestaurantLiveDash() {
       <div className="max-w-7xl mx-auto flex justify-between items-center mb-8 px-4 opacity-40">
         <div className="flex items-center gap-2">
           <Utensils size={16} className="text-red-600" />
-          <span className="text-[10px] tracking-[0.4em]">UCAB.RO / FOOD ENGINE</span>
+          <span className="text-[10px] tracking-[0.4em]">UCAB.RO / UCAB-FOOD romania</span>
         </div>
-        <span className="text-[10px] tracking-[0.4em]">ADMIN TERMINAL v2.0</span>
+     
       </div>
 
       {/* MAIN HEADER */}
@@ -100,24 +100,36 @@ export default function RestaurantLiveDash() {
           <img src={restaurant?.image_url} className="w-32 h-32 rounded-[3.5rem] object-cover shadow-2xl ring-8 ring-[#FDFCF7]" alt="" />
           <div>
             <h1 className="text-6xl md:text-8xl tracking-tighter leading-none mb-2 text-zinc-900 uppercase">UCAB <span className="text-red-600">FOOD</span></h1>
-            <p className="text-2xl text-zinc-400 leading-none mb-4">{restaurant?.name}</p>
+            <div className="mb-4">
+              <p className="text-2xl text-zinc-800 leading-none font-black">{restaurant?.name}</p>
+              <p className="text-[10px] text-red-600 tracking-[0.2em] mt-1 flex items-center gap-2 italic">
+                <MapPin size={12} strokeWidth={3} /> {restaurant?.address || "Adresă nespecificată"}
+              </p>
+            </div>
             <div className="flex items-center gap-4 text-zinc-400 text-[10px] tracking-widest uppercase">
-              <span>RES-ID: {id?.toString().slice(0,8)}</span>
-              <button onClick={() => {navigator.clipboard.writeText(id!.toString()); alert("COPIAT");}}><Copy size={14}/></button>
+              <span className="flex items-center gap-1"><Clock size={12}/> {restaurant?.delivery_time || "30 min"}</span>
+              <span className="opacity-30">|</span>
+              <span>ID: {id?.toString().slice(0,8)}</span>
+              <button onClick={() => {navigator.clipboard.writeText(id!.toString()); alert("COPIAT");}} className="hover:text-red-600 transition-colors"><Copy size={14}/></button>
             </div>
           </div>
         </div>
         <div className="flex gap-10">
           <div className="text-center">
-            <p className="text-[9px] text-zinc-400 mb-1 tracking-widest uppercase">Live Queue</p>
-            <p className="text-6xl text-red-600 font-black">{orders.filter(o => o.status === 'pending' || o.status === 'preparing').length}</p>
+            <p className="text-[9px] text-zinc-400 mb-1 tracking-widest uppercase font-black">Live Queue</p>
+            <p className="text-6xl text-red-600 font-black tracking-tighter">
+              {orders.filter(o => o.status === 'pending' || o.status === 'preparing').length}
+            </p>
           </div>
-          <div className="text-center">
-            <p className="text-[9px] text-zinc-400 mb-1 tracking-widest uppercase">Revenue</p>
-            <p className="text-6xl font-black">{orders.reduce((a, c) => a + Number(c.total_amount), 0).toFixed(0)}</p>
+          <div className="text-center border-l-2 border-zinc-50 pl-10">
+            <p className="text-[9px] text-zinc-400 mb-1 tracking-widest uppercase font-black">Revenue</p>
+            <p className="text-6xl text-zinc-900 font-black tracking-tighter">
+              {orders.reduce((a, c) => a + Number(c.total_amount), 0).toFixed(0)}
+            </p>
           </div>
         </div>
       </header>
+
 
       {/* TABS */}
       <nav className="max-w-7xl mx-auto flex gap-10 mb-12 border-b-2 border-zinc-100 px-6">
