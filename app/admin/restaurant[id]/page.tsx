@@ -14,7 +14,8 @@ export default function RestaurantLiveDash() {
   const { id } = useParams();
   const router = useRouter();
   const [restaurant, setRestaurant] = useState(null);
-  const [orders, setOrders] = useState([]);
+const [orders, setOrders] = useState<any[]>([]);
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
