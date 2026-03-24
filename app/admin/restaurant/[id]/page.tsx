@@ -199,6 +199,11 @@ export default function RestaurantLiveDash() {
           </div>
         )}
       </main>
+            {/* FOOTER STATIC */}
+      <footer className="max-w-7xl mx-auto mt-20 py-8 border-t border-zinc-100 flex flex-col md:flex-row justify-between items-center gap-4 opacity-40">
+        <p className="text-[10px] tracking-[0.3em]">WWW.UCAB.RO</p>
+        <p className="text-[10px] tracking-[0.3em]">UCAB-FOOD POWERED BY BM v 0.13.240326</p>
+      </footer>
     </div>
   );
 }
