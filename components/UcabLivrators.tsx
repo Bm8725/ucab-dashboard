@@ -107,10 +107,10 @@ export default function UcabGlobalFleet() {
         <div className="bg-[#080808] border border-white/5 rounded-[3rem] p-8 flex flex-col lg:flex-row justify-between items-center gap-8 shadow-2xl">
           <div className="flex items-center gap-6">
             <div className="w-16 h-16 bg-red-600 rounded-2xl flex items-center justify-center shadow-lg shadow-red-600/20">
-              <Globe size={32} className="animate-pulse" />
+
             </div>
             <div>
-              <h1 className="text-3xl font-black uppercase tracking-tighter">Global Fleet HQ</h1>
+              <h1 className="text-3xl font-black uppercase tracking-tighter">Livartor ucab-food</h1>
               <div className="flex gap-4 mt-2">
                 <span className="text-[8px] text-green-500 font-bold tracking-widest uppercase">● {livratori.filter(l => l.is_online).length} Online</span>
                 <span className="text-[8px] text-orange-500 font-bold tracking-widest uppercase">● {activeRides.filter(r => r.status !== 'completed').length} Active_Missions</span>
