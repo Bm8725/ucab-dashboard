@@ -201,8 +201,7 @@ export default function UcabSuperDash() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                    <div className="p-8 bg-[#080808] border border-white/5 rounded-[2rem]">
                       <Activity className="text-blue-500 mb-4" />
-                      <h3 className="text-white font-bold italic">Sistem Online</h3>
-                      <p className="text-xs mt-2 italic">Toate serviciile sunt operaționale.</p>
+
                    </div>
                 </div>
               )}
