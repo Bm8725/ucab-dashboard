@@ -3,10 +3,12 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import UcabFood from "@/components/UcabFood";
 import UcabRide from "@/components/UcabRide";
+import UcabLivrators from "@/components/UcabLivrators";
 import { 
   Utensils, Car, Truck, LayoutGrid, Zap, 
   ChevronRight, Bell, Menu, X, Activity, 
-  Settings, ShieldCheck, Lock, LogIn, User, ArrowLeft, Loader2
+  Settings, ShieldCheck, Lock, LogIn, User, ArrowLeft, Loader2,
+  Bike, MessageCircle, Users 
 } from "lucide-react";
 
 export default function UcabSuperDash() {
@@ -57,6 +59,10 @@ export default function UcabSuperDash() {
     food: { color: "text-red-500", bg: "bg-red-600", border: "border-red-500/20" },
     ride: { color: "text-blue-500", bg: "bg-blue-600", border: "border-blue-500/20" },
     util: { color: "text-emerald-500", bg: "bg-emerald-600", border: "border-emerald-500/20" },
+    livrator: { color: "text-orange-500", bg: "bg-orange-600", border: "border-orange-500/20" },
+    status: { color: "text-purple-500", bg: "bg-purple-600", border: "border-purple-500/20" },
+    chat: { color: "text-yellow-500", bg: "bg-yellow-600", border: "border-yellow-500/20" },
+    users: { color: "text-pink-500", bg: "bg-pink-600", border: "border-pink-500/20" },
     settings: { color: "text-zinc-400", bg: "bg-zinc-800", border: "border-white/10" }
   };
 
@@ -155,12 +161,20 @@ export default function UcabSuperDash() {
               <button onClick={() => setIsMenuOpen(false)} className="md:hidden text-white"><X size={24} /></button>
             </div>
 
-            <nav className="flex-1 space-y-2">
+            <nav className="flex-1 space-y-2 overflow-y-auto no-scrollbar">
               <p className="text-[10px] font-black text-zinc-600 tracking-[0.3em] mb-6 px-4">Consolă</p>
               <NavItem icon={<LayoutGrid size={20}/>} label={t[lang].global} active={activeTab === "global"} onClick={() => {setActiveTab("global"); setIsMenuOpen(false);}} activeColor={cur.color} />
               <NavItem icon={<Utensils size={20}/>} label={t[lang].food} active={activeTab === "food"} onClick={() => {setActiveTab("food"); setIsMenuOpen(false);}} activeColor="text-red-500" />
               <NavItem icon={<Car size={20}/>} label={t[lang].ride} active={activeTab === "ride"} onClick={() => {setActiveTab("ride"); setIsMenuOpen(false);}} activeColor="text-blue-500" />
               <NavItem icon={<Truck size={20}/>} label={t[lang].util} active={activeTab === "util"} onClick={() => {setActiveTab("util"); setIsMenuOpen(false);}} activeColor="text-emerald-500" />
+              
+              {/* RUBRICILE NOI IN NAVIGARE */}
+              <div className="pt-4 mt-4 border-t border-white/5 opacity-80">
+                 <NavItem icon={<Bike size={20}/>} label="LIVRATOR" active={activeTab === "livrator"} onClick={() => {setActiveTab("livrator"); setIsMenuOpen(false);}} activeColor="text-orange-500" />
+                 <NavItem icon={<Activity size={20}/>} label="STATUS" active={activeTab === "status"} onClick={() => {setActiveTab("status"); setIsMenuOpen(false);}} activeColor="text-purple-500" />
+                 <NavItem icon={<MessageCircle size={20}/>} label="CHAT" active={activeTab === "chat"} onClick={() => {setActiveTab("chat"); setIsMenuOpen(false);}} activeColor="text-yellow-500" />
+                 <NavItem icon={<Users size={20}/>} label="USERI" active={activeTab === "users"} onClick={() => {setActiveTab("users"); setIsMenuOpen(false);}} activeColor="text-pink-500" />
+              </div>
             </nav>
 
             <div className="mt-auto pt-6 border-t border-white/5 space-y-1">
@@ -193,15 +207,37 @@ export default function UcabSuperDash() {
               )}
             </div>
 
-            {/* RENDER LOGIC */}
+            {/* RENDER LOGIC PENTRU TOATE RUBRICILE */}
             <div className="mt-10">
               {activeTab === "food" && <UcabFood />}
               {activeTab === "ride" && <UcabRide />}
+              
+              {/* PLACEHOLDERS PENTRU MODULELE NOI */}
+              {activeTab === "livrator" && (
+               <UcabLivrators/>
+              )}
+              {activeTab === "status" && (
+                <div className="min-h-[400px] border-2 border-dashed border-white/5 rounded-[3rem] flex items-center justify-center text-zinc-800 italic font-black uppercase tracking-widest">
+                  SYSTEM_HEALTH_MONITOR_OFFLINE
+                </div>
+              )}
+              {activeTab === "chat" && (
+                <div className="min-h-[400px] border-2 border-dashed border-white/5 rounded-[3rem] flex items-center justify-center text-zinc-800 italic font-black uppercase tracking-widest">
+                  ENCRYPTED_CHAT_WAITING_AUTH
+                </div>
+              )}
+              {activeTab === "users" && (
+                <div className="min-h-[400px] border-2 border-dashed border-white/5 rounded-[3rem] flex items-center justify-center text-zinc-800 italic font-black uppercase tracking-widest">
+                  USER_MANAGEMENT_SYNC_REQUIRED
+                </div>
+              )}
+
               {activeTab === "global" && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                    <div className="p-8 bg-[#080808] border border-white/5 rounded-[2rem]">
                       <Activity className="text-blue-500 mb-4" />
-
+                      <p className="text-xs font-bold tracking-widest text-white">SISTEM UCAB ACTIV</p>
+                      <p className="text-[10px] text-zinc-600 mt-2 tracking-widest italic">STREAMING_LIVE_DATA_CONNECTED</p>
                    </div>
                 </div>
               )}
