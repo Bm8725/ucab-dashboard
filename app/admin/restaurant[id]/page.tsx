@@ -13,9 +13,9 @@ import { ChevronLeft, MapPin, Phone, Trash2, Zap, Clock, Store } from "lucide-re
 export default function RestaurantLiveDash() {
   const { id } = useParams();
   const router = useRouter();
-  const [restaurant, setRestaurant] = useState(null);
-const [orders, setOrders] = useState<any[]>([]);
+const [restaurant, setRestaurant] = useState<any>(null);
 
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
