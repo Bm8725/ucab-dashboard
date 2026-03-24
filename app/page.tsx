@@ -17,7 +17,7 @@ export default function UcabSuperDash() {
   const [isLogged, setIsLogged] = useState(false);
   const [lang, setLang] = useState<"ro" | "en">("ro");
   const [mounted, setMounted] = useState(false);
-
+   const APP_DASH_VERSION="0.9.13";
   // --- DATE LOGARE REALE ---
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -133,8 +133,9 @@ export default function UcabSuperDash() {
       {/* HEADER MOBIL */}
       <header className="md:hidden flex items-center justify-between p-6 bg-[#080808]/90 backdrop-blur-xl border-b border-white/5 sticky top-0 z-[100]">
         <div className="flex items-center gap-2">
-          <div className={`w-8 h-8 ${cur.bg} rounded flex items-center justify-center text-white font-black italic`}>U</div>
-          <span className="font-black italic text-white tracking-tighter">UCAB</span>
+          <div className={`w-8 h-8 ${cur.bg} rounded flex items-center justify-center text-white font-black italic`}>U.</div>
+          <span className="font-black italic text-white tracking-tighter">UCAB.ro</span>
+          
         </div>
         <button onClick={() => setIsMenuOpen(true)} className="p-2 text-white bg-white/5 rounded-xl border border-white/10">
           <Menu size={28} />
@@ -152,11 +153,13 @@ export default function UcabSuperDash() {
           <div className="flex flex-col h-full italic">
             <div className="flex items-center justify-between mb-12">
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 ${cur.bg} rounded flex items-center justify-center text-white font-black text-xl shadow-lg`}>U</div>
+                <div className={`w-10 h-10 ${cur.bg} rounded flex items-center justify-center text-white font-black text-xl shadow-lg`}>U.</div>
                 <div className="flex flex-col leading-none">
-                  <span className="text-xl font-black text-white tracking-tighter">UCAB</span>
-                  <span className={`text-[9px] font-bold ${cur.color} tracking-widest mt-1`}>SuperApp</span>
+                  <span className="text-xl font-black text-white tracking-tighter">UCAB.ro</span>
+                  <span className={`text-[9px] font-bold ${cur.color} tracking-widest mt-1`}>dashboard V {APP_DASH_VERSION} </span>
+
                 </div>
+
               </div>
               <button onClick={() => setIsMenuOpen(false)} className="md:hidden text-white"><X size={24} /></button>
             </div>
@@ -193,8 +196,8 @@ export default function UcabSuperDash() {
             <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
               <div>
                 <div className="flex items-center gap-2 mb-6">
-                  <Zap size={16} className={`${cur.color} fill-current animate-bounce`} />
-                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-600 italic leading-none">Live Console Stream</span>
+
+                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-600 italic leading-none">admin dashboard</span>
                 </div>
                 <h1 className="text-6xl md:text-9xl font-black italic text-white uppercase tracking-tighter leading-none transition-all">
                   {activeTab}
