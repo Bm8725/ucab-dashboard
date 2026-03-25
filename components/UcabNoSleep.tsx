@@ -47,7 +47,7 @@ export default function NoSleepComponent() {
         opacity: 0.8
       }}
     >
-      {isActive ? "ECO️ ON" : "KEEP AWAKE"}
+      {isActive ? "AWAKE ON" : "KEEP AWAKE"}
     </button>
   );
 }

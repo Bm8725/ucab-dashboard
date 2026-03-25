@@ -80,7 +80,7 @@ export default function RestaurantLiveDash() {
     };
   }; 
 
-  if (loading) return <div className="h-screen bg-[#FDFCF7] flex items-center justify-center font-black italic text-red-600 tracking-[0.5em] px-6 text-center">UCAB-FOOD LOADING...</div>;
+  if (loading) return <div className="h-screen bg-[#FDFCF7] flex items-center justify-center font-black italic text-red-600 tracking-[0.5em] px-6 text-center">LOADING...</div>;
 
   return (
     <div className="min-h-screen bg-[#FDFCF7] text-zinc-900 p-4 md:p-8 lg:p-12 font-sans italic uppercase font-black">
