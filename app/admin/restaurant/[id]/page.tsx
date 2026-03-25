@@ -17,80 +17,45 @@ export default function RestaurantLiveDash() {
   const ordersPerPage = 6;
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-useEffect(() => {
-  // 1. SETUP AUDIO LOCAL (notify.wav din folderul public)
-  const sound = new Audio("/notify.wav");
-  sound.preload = "auto";
-  audioRef.current = sound;
+  useEffect(() => {
+    audioRef.current = new Audio("https://assets.mixkit.co");
+    const unlockAudio = () => {
+      if (audioRef.current) {
+        audioRef.current.play().then(() => { audioRef.current!.pause(); audioRef.current!.currentTime = 0; }).catch(() => {});
+        window.removeEventListener('click', unlockAudio);
+      }
+    };
+    window.addEventListener('click', unlockAudio);
 
-  const unlockAudio = () => {
-    if (audioRef.current) {
-      audioRef.current.play()
-        .then(() => { 
-          audioRef.current!.pause(); 
-          audioRef.current!.currentTime = 0; 
-          console.log("Audio notify.wav deblocat!");
-        })
-        .catch(() => {});
-      window.removeEventListener('click', unlockAudio);
-    }
-  };
-  window.addEventListener('click', unlockAudio);
-
-  if (!id) {
-    setLoading(false); // Siguranță: oprim loading dacă nu există ID
-    return;
-  }
-
-  // 2. FETCH DATE CU FINALLY (Rezultă în oprirea loading-ului orice ar fi)
-  async function getData() {
-    try {
-      const { data: res, error: resError } = await supabase.from("restaurants").select("*").eq("id", id).single();
-      if (resError) throw resError;
+    if (!id) return;
+    async function getData() {
+      const { data: res } = await supabase.from("restaurants").select("*").eq("id", id).single();
       setRestaurant(res);
-
       if (res) {
-        // Luăm comenzile (cele noi primele) și meniul în paralel
-        const [ordRes, menuRes] = await Promise.all([
-          supabase.from("orders").select("*").eq("restaurant_id", id).order('created_at', { ascending: false }),
-          supabase.from("menu_items").select("*").eq("restaurant_id", id)
-        ]);
-        setOrders(ordRes.data || []);
-        setMenuItems(menuRes.data || []);
+        const { data: ord } = await supabase.from("orders").select("*").eq("restaurant_id", id);
+        setOrders(ord || []);
+        const { data: menu } = await supabase.from("menu_items").select("*").eq("restaurant_id", id);
+        setMenuItems(menu || []);
       }
-    } catch (err) {
-      console.error("Eroare la încărcare:", err);
-    } finally {
-      setLoading(false); // Aici se rezolvă blocajul în "loading"
+      setLoading(false);
     }
-  }
-  getData();
+    getData();
 
-  // 3. REALTIME SYNC - SUNET LA COMANDĂ NOUĂ
-  const channel = supabase.channel(`live-sync-${id}`)
-    .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, (payload: any) => {
-      const orderData = payload.new || payload.old;
-      if (orderData && orderData.restaurant_id === id) {
-        if (payload.eventType === "INSERT") {
-          setOrders((prev) => [payload.new, ...prev]);
-          
-          // TRIGGER SUNET
-          if (audioRef.current) {
-            audioRef.current.currentTime = 0; 
-            audioRef.current.play().catch(e => console.log("Play blocked:", e));
+    const channel = supabase.channel(`live-sync-${id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, (payload: any) => {
+        const orderData = payload.new || payload.old;
+        if (orderData && orderData.restaurant_id === id) {
+          if (payload.eventType === "INSERT") {
+            setOrders((prev) => [payload.new, ...prev]);
+            if (audioRef.current) audioRef.current.play().catch(() => {});
+          } else if (payload.eventType === "UPDATE") {
+            setOrders((prev) => prev.map(o => o.id === payload.new.id ? payload.new : o));
           }
-        } else if (payload.eventType === "UPDATE") {
-          setOrders((prev) => prev.map(o => o.id === payload.new.id ? payload.new : o));
         }
-      }
-    }).subscribe();
+      }).subscribe();
 
-  return () => { 
-    supabase.removeChannel(channel); 
-    window.removeEventListener('click', unlockAudio); 
-  };
-}, [id]);
-
+    return () => { supabase.removeChannel(channel); window.removeEventListener('click', unlockAudio); };
+  }, [id]);
 
   const updateStatus = async (orderId: string, status: string) => {
     await supabase.from("orders").update({ status }).eq("id", orderId);
