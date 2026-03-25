@@ -69,7 +69,7 @@ export default function UcabSuperDash() {
   const cur = themes[activeTab] || themes.global;
 
   const t = {
-    ro: { login: "Autentificare Admin", start: "Intră în Consolă", user: "Utilizator", pass: "Parolă", global: "Global", food: "Food", ride: "Ride", util: "Logistics", settings: "Setări", logout: "Ieșire", back: "Înapoi la Global" },
+    ro: { login: "DASHBOARD ucab", start: "login ", user: "Utilizator", pass: "Parolă", global: "Global", food: "Food", ride: "Ride", util: "Logistics", settings: "Setări", logout: "Ieșire", back: "Înapoi la Global" },
     en: { login: "Admin Login", start: "Enter Console", user: "Username", pass: "Password", global: "Global", food: "Food", ride: "Ride", util: "Logistics", settings: "Settings", logout: "Logout", back: "Back to Global" }
   };
 
@@ -80,9 +80,14 @@ export default function UcabSuperDash() {
         <div className="w-full max-w-md bg-[#080808] border border-white/10 p-10 rounded-[3rem] shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-1 bg-blue-600"></div>
           <div className="flex flex-col items-center mb-10 text-center">
-            <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white mb-6 shadow-xl shadow-blue-600/20">
-              <Lock size={32} />
+            <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-xl shadow-blue-600/20 overflow-hidden">
+              <img 
+                src="/ucabro.png" 
+                alt="UCAB Logo" 
+                className="w-10 h-10 object-contain" 
+              />
             </div>
+
             <h1 className="text-3xl font-black text-white tracking-tighter italic">{t[lang].login}</h1>
           </div>
           <div className="space-y-4">
