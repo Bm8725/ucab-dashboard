@@ -18,44 +18,81 @@ export default function RestaurantLiveDash() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    audioRef.current = new Audio("/notify.wav");
-    const unlockAudio = () => {
-      if (audioRef.current) {
-        audioRef.current.play().then(() => { audioRef.current!.pause(); audioRef.current!.currentTime = 0; }).catch(() => {});
-        window.removeEventListener('click', unlockAudio);
-      }
-    };
-    window.addEventListener('click', unlockAudio);
+  // 1. Inițializare și forțare încărcare
+  const audio = new Audio("/notify.wav");
+  audio.preload = "auto";
+  audio.load(); // Forțează browserul să descarce fișierul acum
+  audioRef.current = audio;
 
-    if (!id) return;
-    async function getData() {
+  // 2. Funcție de deblocare mai "permisivă"
+  const unlockAudio = () => {
+    if (audioRef.current) {
+      // Pe unele browsere trebuie să ruleze un pic de sunet ca să rămână canalul deschis
+      audioRef.current.play()
+        .then(() => {
+          audioRef.current!.pause();
+          audioRef.current!.currentTime = 0;
+          console.log("Audio deblocat cu succes!");
+        })
+        .catch(e => console.error("Eroare deblocare:", e));
+      window.removeEventListener('click', unlockAudio);
+    }
+  };
+  window.addEventListener('click', unlockAudio);
+
+  if (!id) return;
+
+  async function getData() {
+    try {
       const { data: res } = await supabase.from("restaurants").select("*").eq("id", id).single();
       setRestaurant(res);
       if (res) {
-        const { data: ord } = await supabase.from("orders").select("*").eq("restaurant_id", id);
+        const { data: ord } = await supabase.from("orders").select("*").eq("restaurant_id", id).order('created_at', { ascending: false });
         setOrders(ord || []);
         const { data: menu } = await supabase.from("menu_items").select("*").eq("restaurant_id", id);
         setMenuItems(menu || []);
       }
-      setLoading(false);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false); // Garantează ieșirea din loading
     }
-    getData();
+  }
+  getData();
 
-    const channel = supabase.channel(`live-sync-${id}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, (payload: any) => {
-        const orderData = payload.new || payload.old;
-        if (orderData && orderData.restaurant_id === id) {
-          if (payload.eventType === "INSERT") {
-            setOrders((prev) => [payload.new, ...prev]);
-            if (audioRef.current) audioRef.current.play().catch(() => {});
-          } else if (payload.eventType === "UPDATE") {
-            setOrders((prev) => prev.map(o => o.id === payload.new.id ? payload.new : o));
+  const channel = supabase.channel(`live-sync-${id}`)
+    .on("postgres_changes", { event: "INSERT", schema: "public", table: "orders" }, (payload: any) => {
+      // Verificăm ID-ul restaurantului
+      if (payload.new && payload.new.restaurant_id === id) {
+        setOrders((prev) => [payload.new, ...prev]);
+        
+        // 3. LOGICA DE REDARE REPARATĂ
+        if (audioRef.current) {
+          audioRef.current.currentTime = 0; // Esențial pentru repetare
+          audioRef.current.volume = 1.0;
+          const playPromise = audioRef.current.play();
+          
+          if (playPromise !== undefined) {
+            playPromise.catch(error => {
+              console.log("Redarea a fost blocată. Asigură-te că ai dat un click pe pagină după refresh.");
+            });
           }
         }
-      }).subscribe();
+      }
+    })
+    .on("postgres_changes", { event: "UPDATE", schema: "public", table: "orders" }, (payload: any) => {
+      if (payload.new && payload.new.restaurant_id === id) {
+        setOrders((prev) => prev.map(o => o.id === payload.new.id ? payload.new : o));
+      }
+    })
+    .subscribe();
 
-    return () => { supabase.removeChannel(channel); window.removeEventListener('click', unlockAudio); };
-  }, [id]);
+  return () => {
+    supabase.removeChannel(channel);
+    window.removeEventListener('click', unlockAudio);
+  };
+}, [id]);
+
 
   const updateStatus = async (orderId: string, status: string) => {
     await supabase.from("orders").update({ status }).eq("id", orderId);
