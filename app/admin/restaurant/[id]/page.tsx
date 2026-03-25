@@ -90,9 +90,9 @@ export default function RestaurantLiveDash() {
   <img 
     src="/ucabfood.png" 
     alt="UCAB Food Logo" 
-    style={{ width: '16px', height: '16px', objectFit: 'contain' }}
+    style={{ width: '32px', height: '32px', objectFit: 'contain' }}
   />
-  <span className="text-[8px] md:text-[10px] tracking-[0.4em] uppercase">
+  <span className="text-[12px] md:text-[10px] tracking-[0.4em] uppercase">
     UCAB.RO / UCAB-FOOD ROMANIA
   </span>
 </div>
