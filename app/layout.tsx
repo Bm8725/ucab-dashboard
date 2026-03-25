@@ -1,6 +1,8 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
 import { Analytics } from '@vercel/analytics/next';
+import NoSleepComponent from "./components/NoSleep";
+import NoSleep from "nosleep.js";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -46,6 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={`${inter.className} bg-[#050505] text-white min-h-screen antialiased`}>
         {children}
         <Analytics/>
+        <NoSleepComponent/>
       </body>
     </html>
   );
