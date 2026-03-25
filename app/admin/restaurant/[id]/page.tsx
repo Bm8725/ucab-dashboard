@@ -18,7 +18,7 @@ export default function RestaurantLiveDash() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    audioRef.current = new Audio("https://assets.mixkit.co");
+    audioRef.current = new Audio("/notify.wav");
     const unlockAudio = () => {
       if (audioRef.current) {
         audioRef.current.play().then(() => { audioRef.current!.pause(); audioRef.current!.currentTime = 0; }).catch(() => {});
