@@ -1,8 +1,7 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
 import { Analytics } from '@vercel/analytics/next';
-import NoSleepComponent from "./components/NoSleep";
-import NoSleep from "nosleep.js";
+import NoSleepComponent from "@/components/UcabNoSleep";
 
 const inter = Inter({ subsets: ["latin"] });
 
