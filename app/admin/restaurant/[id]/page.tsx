@@ -17,45 +17,67 @@ export default function RestaurantLiveDash() {
   const ordersPerPage = 6;
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  useEffect(() => {
-    audioRef.current = new Audio("https://assets.mixkit.co");
-    const unlockAudio = () => {
-      if (audioRef.current) {
-        audioRef.current.play().then(() => { audioRef.current!.pause(); audioRef.current!.currentTime = 0; }).catch(() => {});
-        window.removeEventListener('click', unlockAudio);
-      }
-    };
-    window.addEventListener('click', unlockAudio);
+useEffect(() => {
+  // 1. CALE MANUALĂ (.wav din folderul public)
+  const sound = new Audio("/notify.wav");
+  sound.preload = "auto";
+  audioRef.current = sound;
 
-    if (!id) return;
-    async function getData() {
-      const { data: res } = await supabase.from("restaurants").select("*").eq("id", id).single();
-      setRestaurant(res);
-      if (res) {
-        const { data: ord } = await supabase.from("orders").select("*").eq("restaurant_id", id);
-        setOrders(ord || []);
-        const { data: menu } = await supabase.from("menu_items").select("*").eq("restaurant_id", id);
-        setMenuItems(menu || []);
-      }
-      setLoading(false);
+  // 2. UNLOCK (Deblocăm canalul audio la primul click al userului)
+  const unlockAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.play()
+        .then(() => {
+          audioRef.current!.pause();
+          audioRef.current!.currentTime = 0;
+          audioRef.current!.volume = 1.0; // Volum maxim
+          console.log("Audio notify.wav deblocat!");
+        })
+        .catch(() => {});
+      window.removeEventListener('click', unlockAudio);
     }
-    getData();
+  };
+  window.addEventListener('click', unlockAudio);
 
-    const channel = supabase.channel(`live-sync-${id}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, (payload: any) => {
-        const orderData = payload.new || payload.old;
-        if (orderData && orderData.restaurant_id === id) {
-          if (payload.eventType === "INSERT") {
-            setOrders((prev) => [payload.new, ...prev]);
-            if (audioRef.current) audioRef.current.play().catch(() => {});
-          } else if (payload.eventType === "UPDATE") {
-            setOrders((prev) => prev.map(o => o.id === payload.new.id ? payload.new : o));
+  if (!id) return;
+
+  // ... (partea de getData rămâne neschimbată)
+
+  // 3. REALTIME SYNC - SUNET DOAR LA INSERT (COMANDĂ NOUĂ)
+  const channel = supabase.channel(`live-sync-${id}`)
+    .on("postgres_changes", { 
+      event: "INSERT", 
+      schema: "public", 
+      table: "orders" 
+    }, (payload: any) => {
+        if (payload.new && payload.new.restaurant_id === id) {
+          setOrders((prev) => [payload.new, ...prev]);
+
+          // REDARE SUNET NOTIFICARE
+          if (audioRef.current) {
+            audioRef.current.currentTime = 0; // Resetăm la începutul sunetului
+            audioRef.current.play().catch(e => console.error("Eroare redare wav:", e));
           }
         }
-      }).subscribe();
+    })
+    .on("postgres_changes", { 
+      event: "UPDATE", 
+      schema: "public", 
+      table: "orders" 
+    }, (payload: any) => {
+        if (payload.new && payload.new.restaurant_id === id) {
+          setOrders((prev) => prev.map(o => o.id === payload.new.id ? payload.new : o));
+          // Aici nu punem sunet, ca să nu sune la fiecare modificare de status
+        }
+    })
+    .subscribe();
 
-    return () => { supabase.removeChannel(channel); window.removeEventListener('click', unlockAudio); };
-  }, [id]);
+  return () => {
+    supabase.removeChannel(channel);
+    window.removeEventListener('click', unlockAudio);
+  };
+}, [id]);
+
 
   const updateStatus = async (orderId: string, status: string) => {
     await supabase.from("orders").update({ status }).eq("id", orderId);
@@ -207,7 +229,7 @@ export default function RestaurantLiveDash() {
             {/* FOOTER STATIC */}
       <footer className="max-w-7xl mx-auto mt-20 py-8 border-t border-zinc-100 flex flex-col md:flex-row justify-between items-center gap-4 opacity-40">
         <p className="text-[10px] tracking-[0.3em]">WWW.UCAB.RO</p>
-        <p className="text-[10px] tracking-[0.3em]">UCAB-FOOD POWERED BY BM v 0.13.240326</p>
+        <p className="text-[10px] tracking-[0.3em]">UCAB-FOOD technologies V 0.9.13</p>
       </footer>
     </div>
   );
