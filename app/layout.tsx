@@ -8,7 +8,7 @@ export const metadata = {
   metadataBase: new URL("https://ucab.ro"),
 
   // PWA - Face aplicația instalabilă
-  manifest: "/manifest.json",
+  manifest: "/manifest.json?v=0.9.13",
 
   // SHARE - Cum arată când trimiți link-ul pe WhatsApp/Social
   openGraph: {

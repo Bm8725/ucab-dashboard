@@ -1,9 +1,10 @@
 {
-  "name": "UCAB  Food",
+  "name": "UCAB Food",
   "short_name": "UCAB-FOOD",
+  "version": "0.9.13",
   "icons": [
     {
-      "src": "/ucafood.png",
+      "src": "/ucabfood.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
