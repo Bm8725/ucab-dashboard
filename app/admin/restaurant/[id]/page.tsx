@@ -85,13 +85,25 @@ export default function RestaurantLiveDash() {
   return (
     <div className="min-h-screen bg-[#FDFCF7] text-zinc-900 p-4 md:p-8 lg:p-12 font-sans italic uppercase font-black">
       
-      {/* TOP LOGO BAR */}
-      <div className="max-w-7xl mx-auto flex justify-between items-center mb-6 md:mb-8 px-2 md:px-4 opacity-40">
-        <div className="flex items-center gap-2">
-          <Utensils size={14} className="text-red-600" />
-          <span className="text-[8px] md:text-[10px] tracking-[0.4em]">UCAB.RO / UCAB-FOOD ROMANIA</span>
-        </div>
-      </div>
+import Image from "next/image"; // Importă componenta Image
+
+{/* TOP LOGO BAR */}
+<div className="max-w-7xl mx-auto flex justify-between items-center mb-6 md:mb-8 px-2 md:px-4 opacity-40">
+  <div className="flex items-center gap-2">
+    {/* Înlocuim Utensils cu Image */}
+    <Image 
+      src="/ucabfood.png" 
+      alt="UCAB Food Logo" 
+      width={16} 
+      height={16} 
+      className="object-contain"
+    />
+    <span className="text-[8px] md:text-[10px] tracking-[0.4em] uppercase">
+      UCAB.RO / UCAB-FOOD ROMANIA
+    </span>
+  </div>
+</div>
+
 
       {/* MAIN HEADER - RESPONSIVE */}
       <header className="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-center mb-10 md:mb-16 bg-white p-6 md:p-10 rounded-[2.5rem] md:rounded-[4rem] shadow-2xl border-4 border-red-600 relative overflow-hidden gap-8">
