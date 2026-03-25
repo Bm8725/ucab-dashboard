@@ -69,7 +69,7 @@ export default function UcabSuperDash() {
   const cur = themes[activeTab] || themes.global;
 
   const t = {
-    ro: { login: "DASHBOARD ucab", start: "login ", user: "Utilizator", pass: "Parolă", global: "Global", food: "Food", ride: "Ride", util: "Logistics", settings: "Setări", logout: "Ieșire", back: "Înapoi la Global" },
+    ro: { login: "APP managament", start: "login ", user: "Utilizator", pass: "Parolă", global: "Global", food: "Food", ride: "Ride", util: "Logistics", settings: "Setări", logout: "Ieșire", back: "Înapoi la Global" },
     en: { login: "Admin Login", start: "Enter Console", user: "Username", pass: "Password", global: "Global", food: "Food", ride: "Ride", util: "Logistics", settings: "Settings", logout: "Logout", back: "Back to Global" }
   };
 
