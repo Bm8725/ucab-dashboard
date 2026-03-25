@@ -85,17 +85,17 @@ export default function RestaurantLiveDash() {
   return (
     <div className="min-h-screen bg-[#FDFCF7] text-zinc-900 p-4 md:p-8 lg:p-12 font-sans italic uppercase font-black">
       
-<div className="flex items-center gap-2">
-  {/* Folosim img standard pentru a evita erorile de tip check la build */}
-  <img 
-    src="/ucabfood.png" 
-    alt="UCAB Food Logo" 
-    style={{ width: '32px', height: '32px', objectFit: 'contain' }}
-  />
-  <span className="text-[12px] md:text-[10px] tracking-[0.4em] uppercase">
-    UCAB.RO / UCAB-FOOD ROMANIA
-  </span>
-</div>
+                      <div className="flex items-center gap-2">
+                        {/* Folosim img standard pentru a evita erorile de tip check la build */}
+                        <img 
+                          src="/ucabfood.png" 
+                          alt="UCAB Food Logo" 
+                          style={{ width: '32px', height: '32px', objectFit: 'contain' }}
+                        />
+                        <span className="text-[12px] md:text-[10px] tracking-[0.4em] uppercase">
+                          UCAB.RO / UCAB-FOOD ROMANIA
+                        </span>
+                      </div>
 
 
       {/* MAIN HEADER - RESPONSIVE */}
