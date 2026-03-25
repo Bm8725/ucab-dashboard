@@ -18,72 +18,44 @@ export default function RestaurantLiveDash() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-  // 1. Definim sunetul local în interiorul efectului
-  const sound = new Audio("/notify.wav");
-  sound.preload = "auto";
-  sound.load();
-  audioRef.current = sound;
+    audioRef.current = new Audio("/notify.wav");
+    const unlockAudio = () => {
+      if (audioRef.current) {
+        audioRef.current.play().then(() => { audioRef.current!.pause(); audioRef.current!.currentTime = 0; }).catch(() => {});
+        window.removeEventListener('click', unlockAudio);
+      }
+    };
+    window.addEventListener('click', unlockAudio);
 
-  // 2. Deblocare audio (Trebuie să dai un click pe pagină după refresh!)
-  const unlock = () => {
-    sound.play().then(() => {
-      sound.pause();
-      sound.currentTime = 0;
-      console.log("🔔 Audio UCAB Food activat!");
-    }).catch(e => console.error("Eroare deblocare:", e));
-    window.removeEventListener('click', unlock);
-  };
-  window.addEventListener('click', unlock);
-
-  if (!id) {
-    setLoading(false);
-    return;
-  }
-
-  async function getData() {
-    try {
+    if (!id) return;
+    async function getData() {
       const { data: res } = await supabase.from("restaurants").select("*").eq("id", id).single();
+      setRestaurant(res);
       if (res) {
-        setRestaurant(res);
-        const [ord, menu] = await Promise.all([
-          supabase.from("orders").select("*").eq("restaurant_id", id).order('created_at', { ascending: false }),
-          supabase.from("menu_items").select("*").eq("restaurant_id", id)
-        ]);
-        setOrders(ord.data || []);
-        setMenuItems(menu.data || []);
+        const { data: ord } = await supabase.from("orders").select("*").eq("restaurant_id", id);
+        setOrders(ord || []);
+        const { data: menu } = await supabase.from("menu_items").select("*").eq("restaurant_id", id);
+        setMenuItems(menu || []);
       }
-    } finally {
-      setLoading(false); // Rezolvă blocajul în loading
+      setLoading(false);
     }
-  }
-  getData();
+    getData();
 
-  // 3. Realtime cu Trigger Manual
-  const channel = supabase.channel(`live-sync-${id}`)
-    .on("postgres_changes", { event: "INSERT", schema: "public", table: "orders" }, (payload) => {
-      if (payload.new && payload.new.restaurant_id === id) {
-        setOrders(prev => [payload.new, ...prev]);
+    const channel = supabase.channel(`live-sync-${id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, (payload: any) => {
+        const orderData = payload.new || payload.old;
+        if (orderData && orderData.restaurant_id === id) {
+          if (payload.eventType === "INSERT") {
+            setOrders((prev) => [payload.new, ...prev]);
+            if (audioRef.current) audioRef.current.play().catch(() => {});
+          } else if (payload.eventType === "UPDATE") {
+            setOrders((prev) => prev.map(o => o.id === payload.new.id ? payload.new : o));
+          }
+        }
+      }).subscribe();
 
-        // REPRODUCERE FORȚATĂ
-        console.log("Comandă nouă! Încercăm sunetul...");
-        sound.currentTime = 0;
-        sound.volume = 1.0;
-        sound.play().catch(e => console.warn("Sunet blocat de browser:", e));
-      }
-    })
-    .on("postgres_changes", { event: "UPDATE", schema: "public", table: "orders" }, (payload) => {
-      if (payload.new && payload.new.restaurant_id === id) {
-        setOrders(prev => prev.map(o => o.id === payload.new.id ? payload.new : o));
-      }
-    })
-    .subscribe();
-
-  return () => {
-    supabase.removeChannel(channel);
-    window.removeEventListener('click', unlock);
-  };
-}, [id]);
-
+    return () => { supabase.removeChannel(channel); window.removeEventListener('click', unlockAudio); };
+  }, [id]);
 
   const updateStatus = async (orderId: string, status: string) => {
     await supabase.from("orders").update({ status }).eq("id", orderId);
