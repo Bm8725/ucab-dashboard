@@ -217,8 +217,8 @@ export default function RestaurantLiveDash() {
                       {menuItems.map((item) => (
                         <tr key={item.id} className={`border-b hover:bg-zinc-50 transition-colors ${!item.is_available ? 'bg-red-50/20' : ''}`}>
                           <td className="p-8"><div className="flex items-center gap-6"><img src={item.image_url} className={`w-16 h-16 rounded-2xl object-cover shadow-lg ${!item.is_available ? 'grayscale opacity-40' : ''}`} alt="" /><div><p className={`text-lg font-black leading-tight ${!item.is_available ? 'text-zinc-400 line-through' : 'text-zinc-900'}`}>{item.name}</p><p className="text-[10px] normal-case italic font-medium text-zinc-400 mt-1 line-clamp-1">{item.description || 'Fără descriere ANPC'}</p></div></div></td>
-                          <td className="p-8 text-center text-zinc-400 font-black text-sm italic">{item.weight || 0} G</td>
-                          <td className="p-8 text-center text-2xl text-red-600 font-black">{item.price} L</td>
+                          <td className="p-8 text-center text-zinc-400 font-black text-sm italic">{item.weight || 0} grame</td>
+                          <td className="p-8 text-center text-2xl text-red-600 font-black">{item.price} ron</td>
                           <td className="p-8 text-right"><button onClick={() => toggleAvailability(item.id, item.is_available)} className={`px-6 py-3 rounded-2xl text-[9px] font-black tracking-widest transition-all ${item.is_available ? 'bg-zinc-900 text-white' : 'bg-red-600 text-white'}`}>{item.is_available ? 'ONLINE' : 'OFFLINE'}</button></td>
                         </tr>
                       ))}
@@ -235,10 +235,10 @@ export default function RestaurantLiveDash() {
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
            <div className="flex items-center gap-3">
               <img src="/ucabfood.png" className="w-8 h-8 grayscale" alt="" />
-              <p className="text-[10px] font-black tracking-[0.3em]">UCAB FOOD ROMANIA © 2024</p>
+              <p className="text-[10px] font-black tracking-[0.3em]">UCAB FOOD by UCAB.ro</p>
            </div>
            <div className="flex gap-8 text-[9px] font-black tracking-widest">
-              <span>ADMIN DASHBOARD</span><span>SISTEM LIVE CLOUD</span>
+              <span>restaurant app</span>
            </div>
         </div>
       </footer>
