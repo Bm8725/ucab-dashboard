@@ -3,7 +3,11 @@ import { useParams } from "next/navigation";
 import { useEffect, useState, useMemo, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
+import AppSupportWidget from "@/components/AppSupportWidget";
+
 import { MapPin, Phone, CheckCircle2, Copy, Clock, Calendar, ChevronLeft, ChevronRight, BellRing, Utensils } from "lucide-react";
+
+
 
 export default function RestaurantLiveDash() {
   const params = useParams();
@@ -203,6 +207,9 @@ export default function RestaurantLiveDash() {
             ))}
           </div>
         )}
+
+          {/* Restul paginii tale food */}
+      <AppSupportWidget  />
       </main>
             {/* FOOTER STATIC */}
       <footer className="max-w-7xl mx-auto mt-20 py-8 border-t border-zinc-100 flex flex-col md:flex-row justify-between items-center gap-4 opacity-40">

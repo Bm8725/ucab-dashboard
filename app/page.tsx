@@ -4,6 +4,9 @@ import { supabase } from "@/lib/supabase";
 import UcabFood from "@/components/UcabFood";
 import UcabRide from "@/components/UcabRide";
 import UcabLivrators from "@/components/UcabLivrators";
+import UcabChatAdmin from "@/components/UcabChat";
+
+
 import { 
   Utensils, Car, Truck, LayoutGrid, Zap, 
   ChevronRight, Bell, Menu, X, Activity, 
@@ -230,9 +233,7 @@ export default function UcabSuperDash() {
                 </div>
               )}
               {activeTab === "chat" && (
-                <div className="min-h-[400px] border-2 border-dashed border-white/5 rounded-[3rem] flex items-center justify-center text-zinc-800 italic font-black uppercase tracking-widest">
-                  ENCRYPTED_CHAT_WAITING_AUTH
-                </div>
+                     <UcabChatAdmin/>
               )}
               {activeTab === "users" && (
                 <div className="min-h-[400px] border-2 border-dashed border-white/5 rounded-[3rem] flex items-center justify-center text-zinc-800 italic font-black uppercase tracking-widest">
