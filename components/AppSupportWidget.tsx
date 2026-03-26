@@ -103,10 +103,10 @@ export default function AppSupportWidget() {
                   <Headset size={20} className="text-[#E11D48]" />
                 </div>
                 <div>
-                  <h3 className="text-black font-bold text-[11px] uppercase tracking-widest leading-none">App Support ucab-food</h3>
+                  <h3 className="text-black font-bold text-[11px] uppercase tracking-widest leading-none">Support  ucab-food</h3>
                   <div className="flex items-center gap-1.5 mt-1.5">
                     <div className="w-1.5 h-1.5 bg-[#E11D48] rounded-full animate-pulse" />
-                    <span className="text-[#E11D48] text-[9px] font-black uppercase tracking-widest opacity-80">service line</span>
+                    <span className="text-[#E11D48] text-[9px] font-black uppercase tracking-widest opacity-80">services</span>
                   </div>
                 </div>
               </div>
@@ -122,7 +122,7 @@ export default function AppSupportWidget() {
                   <ShieldCheck size={32} />
                 </div>
                 <h4 className="text-black font-bold text-xl mb-2 tracking-tight">Salutare!</h4>
-                <p className="text-black/40 text-sm mb-8 leading-relaxed">Avem nevoie de numele restaurantului dvs pentru a conversa.</p>
+                <p className="text-black/40 text-sm mb-8 leading-relaxed">Avem nevoie de un numele restaurantului dvs pentru a initia connversatia.</p>
                 <form onSubmit={handleGdprSubmit} className="space-y-4">
                   <input
                     required value={userName} onChange={(e) => setUserName(e.target.value)}
@@ -139,7 +139,10 @@ export default function AppSupportWidget() {
                 {/* Zona Mesaje Premium */}
                 <div className="flex-1 overflow-y-auto p-6 space-y-5 bg-[#F9F9F7] custom-scrollbar">
                   {messages.length === 0 && (
-
+                    <div className="flex flex-col items-center justify-center h-full opacity-10">
+                      
+                      <p className="text-[9px] text-black font-black uppercase tracking-[0.3em]">chat services</p>
+                    </div>
                   )}
                   {messages.map((m, i) => (
                     <motion.div
