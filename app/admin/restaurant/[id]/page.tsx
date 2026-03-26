@@ -78,7 +78,7 @@ export default function RestaurantLiveDash() {
       <html>
         <body style="font-family: 'Courier New', Courier, monospace; width: 280px; padding: 10px; text-transform: uppercase;">
           <div style="text-align: center; border-bottom: 2px dashed #000; padding-bottom: 10px; margin-bottom: 10px;">
-            <h2 style="margin: 0;">UCAB FOOD</h2>
+            <h2 style="margin: 0;">ucab.ro/ UCAB FOOD</h2>
             <p style="margin: 5px 0;">${restaurant?.name || 'Restaurant'}</p>
             <p style="font-size: 10px;">${new Date(order.created_at).toLocaleString('ro-RO')}</p>
           </div>
@@ -170,16 +170,32 @@ export default function RestaurantLiveDash() {
           </div>
         </div>
         
-        <div className="flex gap-6 md:gap-10 border-t md:border-t-0 md:border-l-2 border-zinc-100 pt-6 md:pt-0 md:pl-10 w-full lg:w-auto justify-around lg:justify-end">
-          <div className="text-center">
-            <p className="text-[8px] md:text-[9px] text-zinc-400 mb-1 tracking-widest uppercase">Comenzi</p>
-            <p className="text-4xl md:text-6xl text-red-600 font-black tracking-tighter leading-none">{orders.filter(o => o.status === 'pending' || o.status === 'preparing').length}</p>
-          </div>
-          <div className="text-center">
-            <p className="text-[8px] md:text-[9px] text-zinc-400 mb-1 tracking-widest uppercase">Revenue</p>
-            <p className="text-4xl md:text-6xl text-zinc-900 font-black tracking-tighter leading-none">{orders.reduce((a, c) => a + Number(c.total_amount), 0).toFixed(0)}</p>
-          </div>
-        </div>
+<div className="flex gap-6 md:gap-10 border-t md:border-t-0 md:border-l-2 border-zinc-100 pt-6 md:pt-0 md:pl-10 w-full lg:w-auto justify-around lg:justify-end">
+  {/* NUMĂR TOTAL COMENZI DIN DB (Toate timpurile) */}
+  <div className="text-center">
+    <p className="text-[8px] md:text-[9px] text-zinc-400 mb-1 tracking-widest uppercase font-black">Comenzi Total</p>
+    <p className="text-4xl md:text-6xl text-zinc-900 font-black tracking-tighter leading-none">
+      {restaurant?.orders_count || 0}
+    </p>
+  </div>
+
+  {/* COMENZI ACTIVE (Afișate cu Roșu conform stilului tău) */}
+  <div className="text-center">
+    <p className="text-[8px] md:text-[9px] text-zinc-400 mb-1 tracking-widest uppercase font-black">Active</p>
+    <p className="text-4xl md:text-6xl text-red-600 font-black tracking-tighter leading-none">
+      {orders.filter(o => o.status === 'pending' || o.status === 'preparing').length}
+    </p>
+  </div>
+
+  {/* REVENUE TOTAL */}
+  <div className="text-center">
+    <p className="text-[8px] md:text-[9px] text-zinc-400 mb-1 tracking-widest uppercase font-black">Revenue</p>
+    <p className="text-4xl md:text-6xl text-zinc-900 font-black tracking-tighter leading-none">
+      {orders.reduce((a, c) => a + Number(c.total_amount), 0).toFixed(0)}
+    </p>
+  </div>
+</div>
+
       </header>
 
       <div className="max-w-7xl w-full mx-auto flex flex-col md:flex-row justify-between items-center mb-8 gap-6">
