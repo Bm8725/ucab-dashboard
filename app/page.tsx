@@ -5,6 +5,7 @@ import UcabFood from "@/components/UcabFood";
 import UcabRide from "@/components/UcabRide";
 import UcabLivrators from "@/components/UcabLivrators";
 import UcabChatAdmin from "@/components/UcabChat";
+import UcabStatusDelivery from "@/components/UcabStatusDelivery"; ///
 
 
 import { 
@@ -13,6 +14,7 @@ import {
   Settings, ShieldCheck, Lock, LogIn, User, ArrowLeft, Loader2,
   Bike, MessageCircle, Users 
 } from "lucide-react";
+import UcabCeoDashboard from "@/components/UcabStatusDelivery";
 
 export default function UcabSuperDash() {
   const [activeTab, setActiveTab] = useState("global");
@@ -63,7 +65,7 @@ export default function UcabSuperDash() {
     ride: { color: "text-blue-500", bg: "bg-blue-600", border: "border-blue-500/20" },
     util: { color: "text-emerald-500", bg: "bg-emerald-600", border: "border-emerald-500/20" },
     livrator: { color: "text-orange-500", bg: "bg-orange-600", border: "border-orange-500/20" },
-    status: { color: "text-purple-500", bg: "bg-purple-600", border: "border-purple-500/20" },
+    status : { color: "text-purple-500", bg: "bg-purple-600", border: "border-purple-500/20" },
     chat: { color: "text-yellow-500", bg: "bg-yellow-600", border: "border-yellow-500/20" },
     users: { color: "text-pink-500", bg: "bg-pink-600", border: "border-pink-500/20" },
     settings: { color: "text-zinc-400", bg: "bg-zinc-800", border: "border-white/10" }
@@ -72,7 +74,7 @@ export default function UcabSuperDash() {
   const cur = themes[activeTab] || themes.global;
 
   const t = {
-    ro: { login: "APP managament", start: "login ", user: "Utilizator", pass: "Parolă", global: "Global", food: "Food", ride: "Ride", util: "Logistics", settings: "Setări", logout: "Ieșire", back: "Înapoi la Global" },
+    ro: { login: "APP managament", start: "login ", user: "Utilizator", pass: "Parolă", global: "Global Overview", food: "Restaurants ", ride: "Drivers", util: "Logistics", settings: "Setări", logout: "Ieșire", back: "Înapoi la Global" },
     en: { login: "Admin Login", start: "Enter Console", user: "Username", pass: "Password", global: "Global", food: "Food", ride: "Ride", util: "Logistics", settings: "Settings", logout: "Logout", back: "Back to Global" }
   };
 
@@ -173,7 +175,7 @@ export default function UcabSuperDash() {
             </div>
 
             <nav className="flex-1 space-y-2 overflow-y-auto no-scrollbar">
-              <p className="text-[10px] font-black text-zinc-600 tracking-[0.3em] mb-6 px-4">Consolă</p>
+              <p className="text-[10px] font-black text-zinc-600 tracking-[0.3em] mb-6 px-4">Options</p>
               <NavItem icon={<LayoutGrid size={20}/>} label={t[lang].global} active={activeTab === "global"} onClick={() => {setActiveTab("global"); setIsMenuOpen(false);}} activeColor={cur.color} />
               <NavItem icon={<Utensils size={20}/>} label={t[lang].food} active={activeTab === "food"} onClick={() => {setActiveTab("food"); setIsMenuOpen(false);}} activeColor="text-red-500" />
               <NavItem icon={<Car size={20}/>} label={t[lang].ride} active={activeTab === "ride"} onClick={() => {setActiveTab("ride"); setIsMenuOpen(false);}} activeColor="text-blue-500" />
@@ -181,8 +183,8 @@ export default function UcabSuperDash() {
               
               {/* RUBRICILE NOI IN NAVIGARE */}
               <div className="pt-4 mt-4 border-t border-white/5 opacity-80">
-                 <NavItem icon={<Bike size={20}/>} label="LIVRATOR" active={activeTab === "livrator"} onClick={() => {setActiveTab("livrator"); setIsMenuOpen(false);}} activeColor="text-orange-500" />
-                 <NavItem icon={<Activity size={20}/>} label="STATUS" active={activeTab === "status"} onClick={() => {setActiveTab("status"); setIsMenuOpen(false);}} activeColor="text-purple-500" />
+                 <NavItem icon={<Bike size={20}/>} label="LIVRATORI" active={activeTab === "livrator"} onClick={() => {setActiveTab("livrator"); setIsMenuOpen(false);}} activeColor="text-orange-500" />
+                 <NavItem icon={<Activity size={20}/>} label="STATUS Delivery" active={activeTab === "status"} onClick={() => {setActiveTab("status"); setIsMenuOpen(false);}} activeColor="text-purple-500" />
                  <NavItem icon={<MessageCircle size={20}/>} label="CHAT" active={activeTab === "chat"} onClick={() => {setActiveTab("chat"); setIsMenuOpen(false);}} activeColor="text-yellow-500" />
                  <NavItem icon={<Users size={20}/>} label="USERI" active={activeTab === "users"} onClick={() => {setActiveTab("users"); setIsMenuOpen(false);}} activeColor="text-pink-500" />
               </div>
@@ -228,9 +230,7 @@ export default function UcabSuperDash() {
                <UcabLivrators/>
               )}
               {activeTab === "status" && (
-                <div className="min-h-[400px] border-2 border-dashed border-white/5 rounded-[3rem] flex items-center justify-center text-zinc-800 italic font-black uppercase tracking-widest">
-                  SYSTEM_HEALTH_MONITOR_OFFLINE
-                </div>
+                  <UcabCeoDashboard />
               )}
               {activeTab === "chat" && (
                      <UcabChatAdmin/>
