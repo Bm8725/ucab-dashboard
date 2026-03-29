@@ -139,12 +139,7 @@ export default function RideshareMap({ lat, lng, pickup }: RideshareMapProps) {
         </div>
         
         <div className="space-y-4">
-          <div className="flex flex-col">
-            <span className="text-[7px] text-zinc-500 uppercase font-black tracking-[0.2em] mb-1">Telemetry</span>
-            <div className="flex items-center gap-2 text-green-400 font-black text-[10px] italic">
-               <ShieldCheck size={12} /> LIVE_SYNC
-            </div>
-          </div>
+
           <div className="pt-2 border-t border-white/5 font-mono text-[9px] text-zinc-400">
              {driverPos[1].toFixed(5)} N / {driverPos[0].toFixed(5)} E
           </div>
