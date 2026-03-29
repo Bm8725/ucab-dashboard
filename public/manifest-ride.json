@@ -1,0 +1,17 @@
+{
+  "name": "UCAB Ride Share",
+  "short_name": "UCAB-RIDE",
+  "version": "1.0.0",
+  "icons": [
+    {
+      "src": "/ucabapp.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#02060a",
+  "theme_color": "#2563eb"
+}

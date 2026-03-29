@@ -22,6 +22,16 @@ export default function UcabRideshareControl() {
   const router = useRouter();
   const id = params?.id as string;
   
+
+    useEffect(() => {
+    const link = document.querySelector("link[rel*='manifest']") as HTMLLinkElement;
+    if (link) {
+      link.href = "/manifest-ride.json";
+    }
+    document.title = "UCAB RIDE - PILOT PANEL";
+  }, []);
+
+
   const [activeTab, setActiveTab] = useState<'grid' | 'log' | 'pilot'>('grid');
   const [driver, setDriver] = useState<any>(null);
   const [activeRide, setActiveRide] = useState<any>(null);
