@@ -115,14 +115,14 @@ export default function DriversFleet() {
       {/* HEADER */}
       <div className="flex justify-between items-end mb-10 border-b-2 border-white/10 pb-6">
         <div>
-          <h1 className="text-6xl tracking-tighter uppercase">Fleet Drivers</h1>
+          <h1 className="text-6xl tracking-tighter uppercase">ucab Drivers</h1>
           <p className="text-blue-500 text-[10px] mt-2 tracking-widest italic font-bold">GESTIUNE ȘOFERI RIDE-SHARING</p>
         </div>
         <button 
           onClick={() => { setEditingDriver(null); setForm(initialForm); setShowModal(true); }} 
           className="bg-blue-600 px-10 py-5 rounded-2xl text-[10px] hover:bg-white hover:text-black transition-all shadow-[0_0_30px_rgba(37,99,235,0.4)]"
         >
-          + REGISTER NEW PILOT
+          + REGISTER NEW PILOT UCAB
         </button>
       </div>
 
@@ -145,12 +145,12 @@ export default function DriversFleet() {
                       </div>
                       
                       <div className="bg-blue-600/10 border border-blue-600/20 p-2 rounded-xl flex items-center justify-between">
-                         <span className="text-[8px] text-blue-400 font-mono lowercase truncate pr-4">/fleet/{d.id}</span>
+                         <span className="text-[8px] text-blue-400 font-mono lowercase truncate pr-4">/admin/drivers/{d.id}</span>
                          <div className="flex gap-2">
                             <button onClick={() => handleCopyUrl(d.id)} className="p-2 bg-blue-600/20 rounded-lg hover:bg-blue-600 transition-all">
                               {copiedId === d.id ? <Check size={12} /> : <Copy size={12} />}
                             </button>
-                            <a href={`/fleet/${d.id}`} target="_blank" className="p-2 bg-zinc-800 rounded-lg hover:bg-white hover:text-black transition-all">
+                            <a href={`/admin/drivers/${d.id}`} target="_blank" className="p-2 bg-zinc-800 rounded-lg hover:bg-white hover:text-black transition-all">
                               <ExternalLink size={12} />
                             </a>
                          </div>
