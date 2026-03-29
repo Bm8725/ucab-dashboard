@@ -127,7 +127,7 @@ export default function LiveMap({ lat, lng, pickup }: LiveMapProps) {
         
         <div className="space-y-3">
           <div className="flex flex-col">
-            <span className="text-[7px] text-zinc-400 uppercase font-black tracking-widest">Misiune_Food</span>
+            <span className="text-[7px] text-zinc-400 uppercase font-black tracking-widest">Mission</span>
             <div className="flex items-center gap-2 text-red-600 font-black text-sm italic leading-none">
                <Navigation size={14} className="rotate-45" />
                {distance ? `${distance} KM` : '--.--'}
