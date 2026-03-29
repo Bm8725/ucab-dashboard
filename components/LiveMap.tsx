@@ -22,6 +22,7 @@ export default function LiveMap({ lat, lng, pickup }: LiveMapProps) {
     setMounted(true);
   }, []);
 
+  
   // Coordonate sigure (Bucuresti default)
   const driverPos = useMemo<[number, number]>(() => [
     lng ?? 26.1025, 
