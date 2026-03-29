@@ -86,13 +86,39 @@ export default function UcabMissionControl() {
     
     if (nextState) {
       // Incepem urmarirea locatiei GPS
-      watchId.current = navigator.geolocation.watchPosition(async (pos) => {
-        const { latitude, longitude } = pos.coords;
-        // Update in state-ul local pentru a muta markerul pe harta imediat
-        setDriver((prev: any) => ({ ...prev, lat: latitude, lng: longitude }));
-        // Update in DB pentru dispecerat
-        await supabase.from("drivers").update({ lat: latitude, lng: longitude }).eq("id", id);
-      }, (err) => console.error(err), { enableHighAccuracy: true, distanceFilter: 10 });
+watchId.current = navigator.geolocation.watchPosition(
+  async (pos) => {
+    const { latitude, longitude } = pos.coords;
+
+    // 1. Update imediat în interfața grafică (pentru marker-ul de pe hartă)
+    setDriver((prev: any) => ({ 
+      ...prev, 
+      lat: latitude, 
+      lng: longitude 
+    }));
+
+    try {
+      // 2. Update în baza de date Supabase pentru dispecerat
+      const { error } = await supabase
+        .from("drivers")
+        .update({ lat: latitude, lng: longitude })
+        .eq("id", id);
+
+      if (error) throw error;
+    } catch (err) {
+      console.error("Eroare la update DB:", err);
+    }
+  },
+  (err) => {
+    console.error("Eroare Geolocation:", err);
+  },
+  { 
+    enableHighAccuracy: true, // Folosește GPS-ul pentru precizie maximă
+    maximumAge: 0,            // Nu folosi locații vechi din cache
+    timeout: 5000             // Așteaptă maxim 5 secunde pentru un semnal
+  }
+);
+
     } else if (watchId.current) {
       navigator.geolocation.clearWatch(watchId.current);
     }
