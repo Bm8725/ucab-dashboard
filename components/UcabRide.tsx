@@ -7,7 +7,8 @@ import {
 } from "lucide-react";
 
 export default function DriversFleet() {
-  const [drivers, setDrivers] = useState([]);
+const [drivers, setDrivers] = useState<any[]>([]);
+
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [uploading, setUploading] = useState(null);
