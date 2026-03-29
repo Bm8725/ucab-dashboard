@@ -41,7 +41,8 @@ const [drivers, setDrivers] = useState<any[]>([]);
   }
 
   // --- LOGICĂ ȘTERGERE ---
-  async function handleDelete(id) {
+async function handleDelete(id: string) {
+
     if (!confirm("Ești sigur că vrei să ștergi definitiv acest pilot din sistem?")) return;
     
     const { error } = await supabase.from("drivers").delete().eq("id", id);
