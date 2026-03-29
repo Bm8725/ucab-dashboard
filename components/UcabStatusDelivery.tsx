@@ -234,6 +234,8 @@ function TimelineStep({ active, label, time, icon: Icon = Clock, isLast, isAlert
   );
 }
 
+
+
 // INFO ROW COMPONENT
 function DetailRow({ label, val, icon: Icon }: any) {
   return (
