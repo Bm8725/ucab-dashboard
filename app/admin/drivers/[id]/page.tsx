@@ -28,7 +28,7 @@ export default function UcabRideshareControl() {
     if (link) {
       link.href = "/manifest-ride.json";
     }
-    document.title = "UCAB RIDE - PILOT PANEL";
+    document.title = "UCAB RIDE SHARE - APP CONTROL";
   }, []);
 
 
