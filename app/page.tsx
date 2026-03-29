@@ -6,7 +6,8 @@ import UcabRide from "@/components/UcabRide";
 import UcabLivrators from "@/components/UcabLivrators";
 import UcabChatAdmin from "@/components/UcabChat";
 import UcabStatusDelivery from "@/components/UcabStatusDelivery"; ///
-
+import UcabRiders from "@/components/UcabRiders"; ///
+import UcabGlobal from "@/components/UcabGlobal"; ///
 
 import { 
   Utensils, Car, Truck, LayoutGrid, Zap, 
@@ -15,6 +16,7 @@ import {
   Bike, MessageCircle, Users 
 } from "lucide-react";
 import UcabCeoDashboard from "@/components/UcabStatusDelivery";
+import RidersDashboard from "@/components/UcabRiders";
 
 export default function UcabSuperDash() {
   const [activeTab, setActiveTab] = useState("global");
@@ -59,17 +61,19 @@ export default function UcabSuperDash() {
     setIsLogged(false);
   }
 
-  const themes: any = {
-    global: { color: "text-blue-500", bg: "bg-blue-600", border: "border-blue-500/20" },
-    food: { color: "text-red-500", bg: "bg-red-600", border: "border-red-500/20" },
-    ride: { color: "text-blue-500", bg: "bg-blue-600", border: "border-blue-500/20" },
-    util: { color: "text-emerald-500", bg: "bg-emerald-600", border: "border-emerald-500/20" },
-    livrator: { color: "text-orange-500", bg: "bg-orange-600", border: "border-orange-500/20" },
-    status : { color: "text-purple-500", bg: "bg-purple-600", border: "border-purple-500/20" },
-    chat: { color: "text-yellow-500", bg: "bg-yellow-600", border: "border-yellow-500/20" },
-    users: { color: "text-pink-500", bg: "bg-pink-600", border: "border-pink-500/20" },
-    settings: { color: "text-zinc-400", bg: "bg-zinc-800", border: "border-white/10" }
-  };
+const themes: any = {
+  // Culoarea "Supabase" este emerald-500/600
+  global: { color: "text-emerald-500", bg: "bg-emerald-600", border: "border-emerald-500/20" },
+  food: { color: "text-red-500", bg: "bg-red-600", border: "border-red-500/20" },
+  ride: { color: "text-blue-500", bg: "bg-blue-600", border: "border-blue-500/20" },
+  util: { color: "text-emerald-500", bg: "bg-emerald-600", border: "border-emerald-500/20" },
+  livrator: { color: "text-orange-500", bg: "bg-orange-600", border: "border-orange-500/20" },
+  status : { color: "text-purple-500", bg: "bg-purple-600", border: "border-purple-500/20" },
+  chat: { color: "text-yellow-500", bg: "bg-yellow-600", border: "border-yellow-500/20" },
+  users: { color: "text-pink-500", bg: "bg-pink-600", border: "border-pink-500/20" },
+  settings: { color: "text-zinc-400", bg: "bg-[#1c1c1c]", border: "border-white/10" }
+};
+
 
   const cur = themes[activeTab] || themes.global;
 
@@ -236,19 +240,11 @@ export default function UcabSuperDash() {
                      <UcabChatAdmin/>
               )}
               {activeTab === "users" && (
-                <div className="min-h-[400px] border-2 border-dashed border-white/5 rounded-[3rem] flex items-center justify-center text-zinc-800 italic font-black uppercase tracking-widest">
-                  USER_MANAGEMENT_SYNC_REQUIRED
-                </div>
+               <UcabRiders/>
               )}
 
               {activeTab === "global" && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                   <div className="p-8 bg-[#080808] border border-white/5 rounded-[2rem]">
-                      <Activity className="text-blue-500 mb-4" />
-                      <p className="text-xs font-bold tracking-widest text-white">SISTEM UCAB ACTIV</p>
-                      <p className="text-[10px] text-zinc-600 mt-2 tracking-widest italic">STREAMING_LIVE_DATA_CONNECTED</p>
-                   </div>
-                </div>
+                  <UcabGlobal />
               )}
             </div>
           </div>
