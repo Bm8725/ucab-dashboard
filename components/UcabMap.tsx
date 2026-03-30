@@ -3,144 +3,181 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import Map, { Marker, Source, Layer, MapRef } from 'react-map-gl/mapbox';
 import "mapbox-gl/dist/mapbox-gl.css";
-import { Car, User, Navigation2, ShieldCheck, Zap, Globe } from "lucide-react";
+import { Car, User, Compass, Crosshair, Zap, Navigation2 } from "lucide-react";
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
 interface RideshareMapProps {
   lat?: number;
   lng?: number;
-  pickup?: [number, number]; // [lat, lng]
+  heading?: number; 
+  pickup?: [number, number]; 
+  suggestedRoute?: any; 
 }
 
-export default function RideshareMap({ lat, lng, pickup }: RideshareMapProps) {
+export default function RideshareMap({ lat, lng, heading, pickup, suggestedRoute }: RideshareMapProps) {
   const mapRef = useRef<MapRef>(null);
   const [mounted, setMounted] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(true);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Coordonate Pilot [lng, lat]
+  // Stabilizăm coordonatele pentru a evita eroarea de render
   const driverPos = useMemo<[number, number]>(() => [
-    lng ?? 26.1025, 
-    lat ?? 44.4268
-  ], [lat, lng]);
+    lng ?? 25.4585, 
+    lat ?? 44.9315
+  ], [lng, lat]);
 
-  // Coordonate Pasager [lng, lat]
   const passengerPos = useMemo<[number, number] | null>(() => 
     (pickup && pickup.length >= 2) ? [pickup[1], pickup[0]] : null, 
   [pickup]);
 
-  // 1. URMARIRE AUTOMATĂ ȘOFER (Auto-centering)
-  // Când lat/lng se schimbă în baza de date, harta se mută lin după șofer
+  const safeHeading = useMemo(() => heading ?? 0, [heading]);
+
+  // --- LOGICĂ NAVIGAȚIE 3D ȘI URRMĂRIRE AUTOMATĂ (FIXED) ---
   useEffect(() => {
-    if (mapRef.current && !passengerPos) {
+    if (mapRef.current && isFollowing) {
       mapRef.current.flyTo({
         center: driverPos,
-        speed: 0.8,
-        curve: 1,
+        duration: 1000,
         essential: true,
-        bearing: 0, // Forțează Nordul în timpul mișcării
-        pitch: 45
+        zoom: 17.5,
+        pitch: 65,
+        bearing: safeHeading, 
       });
     }
-  }, [driverPos, passengerPos]);
+    // Dependențe stabile: driverPos este array memoizat, safeHeading e număr, isFollowing e bool
+  }, [driverPos, safeHeading, isFollowing]);
 
-  // 2. AUTO-FIT VIZUAL (Când apare pasagerul)
-  useEffect(() => {
-    if (mapRef.current && passengerPos) {
-      mapRef.current.fitBounds([driverPos, passengerPos] as [[number, number], [number, number]], {
-        padding: 100,
-        duration: 2000,
-        bearing: 0, // Menține Nordul sus după încadrare
-        pitch: 45
-      });
-    }
-  }, [driverPos, passengerPos]);
+  const handleRecenter = () => {
+    setIsFollowing(true);
+    mapRef.current?.flyTo({ 
+      center: driverPos, 
+      zoom: 18, 
+      pitch: 70, 
+      bearing: safeHeading, 
+      duration: 1500 
+    });
+  };
 
-  const routeData: any = useMemo(() => ({
-    type: "Feature",
-    geometry: {
-      type: "LineString",
-      coordinates: passengerPos ? [driverPos, passengerPos] : [],
-    },
-  }), [driverPos, passengerPos]);
+  const routeData = useMemo(() => {
+    if (suggestedRoute) return suggestedRoute;
+    return {
+      type: "Feature",
+      geometry: {
+        type: "LineString",
+        coordinates: passengerPos ? [driverPos, passengerPos] : [],
+      },
+    };
+  }, [driverPos, passengerPos, suggestedRoute]);
 
-  if (!mounted) return <div className="w-full h-full bg-[#02060a] animate-pulse" />;
+  if (!mounted) return <div className="w-full h-full bg-[#02060a] flex items-center justify-center text-blue-500 font-black italic">UCAB_GRID_INITIALIZING...</div>;
 
   return (
-    <div className="w-full h-full relative overflow-hidden">
+    <div className="w-full h-full relative overflow-hidden font-sans">
       <Map
         ref={mapRef}
         initialViewState={{
           longitude: driverPos[0],
           latitude: driverPos[1],
-          zoom: 15,
-          pitch: 45,
-          bearing: 0, // Începe orientat spre NORD
+          zoom: 16,
+          pitch: 60,
+          bearing: 0,
         }}
-        // --- BLOCARE ORIENTARE NORD ---
-        bearing={0}               // Forțează valoarea 0 (Nord)
-        dragRotate={false}        // Dezactivează rotirea cu degetele/click-dreapta
-        touchZoomRotate={false}   // Permite zoom, dar interzice rotirea pe mobil
-        pitchWithRotate={false}   // Blochează schimbarea unghiului 3D prin rotire
-        // ------------------------------
+        dragRotate={false}
+        touchZoomRotate={false}
+        pitchWithRotate={false}
+        onMoveStart={() => setIsFollowing(false)} 
         style={{ width: "100%", height: "100%" }}
         mapStyle="mapbox://styles/mapbox/navigation-night-v1"
         mapboxAccessToken={MAPBOX_TOKEN}
       >
-        {/* TRASEU UCAB */}
+        {/* RUTA ELECTRICĂ */}
         {passengerPos && (
           <Source id="ride-route" type="geojson" data={routeData}>
+            <Layer
+              id="route-glow"
+              type="line"
+              paint={{
+                "line-color": "#3b82f6",
+                "line-width": 12,
+                "line-blur": 8,
+                "line-opacity": 0.4
+              }}
+            />
             <Layer
               id="route-line"
               type="line"
               paint={{
-                "line-color": "#3b82f6",
+                "line-color": "#60a5fa",
                 "line-width": 5,
-                "line-opacity": 0.8
               }}
               layout={{ "line-cap": "round", "line-join": "round" }}
             />
           </Source>
         )}
 
-        {/* MARKER PILOT (CAR) */}
+        {/* MAȘINA (Orientată 3D) */}
         <Marker longitude={driverPos[0]} latitude={driverPos[1]} anchor="center">
-          <div className="relative flex items-center justify-center">
-            <div className="absolute w-14 h-14 bg-blue-500/20 rounded-full animate-ping" />
-            <div className="bg-blue-600 p-3 rounded-2xl shadow-[0_0_25px_rgba(59,130,246,0.6)] border-2 border-white text-white z-10 transition-transform duration-500">
-              <Car size={24} strokeWidth={2.5} />
+          <div 
+            className="transition-transform duration-500 flex items-center justify-center"
+            style={{ transform: `rotate(${safeHeading}deg)` }}
+          >
+            <div className="absolute w-20 h-20 bg-blue-500/20 rounded-full animate-pulse" />
+            <div className="bg-blue-600 p-4 rounded-2xl shadow-[0_0_40px_rgba(59,130,246,0.8)] border-2 border-white text-white z-10">
+              <Car size={32} strokeWidth={2.5} />
             </div>
           </div>
         </Marker>
 
-        {/* MARKER PASAGER */}
+        {/* PASAGER */}
         {passengerPos && (
           <Marker longitude={passengerPos[0]} latitude={passengerPos[1]} anchor="bottom">
             <div className="flex flex-col items-center">
               <div className="bg-white p-2 rounded-full shadow-2xl border-2 border-blue-600 text-blue-600 animate-bounce">
-                <User size={20} fill="currentColor" />
-              </div>
-              <div className="mt-1 bg-blue-600 text-white text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-widest">
-                Pickup
+                <User size={24} fill="currentColor" />
               </div>
             </div>
           </Marker>
         )}
       </Map>
 
-      {/* TACTICAL OVERLAY */}
-      <div className="absolute top-6 left-6 p-5 bg-black/60 backdrop-blur-2xl border border-white/10 rounded-[2.2rem] shadow-2xl pointer-events-none">
-        <div className="flex items-center gap-2 mb-5">
-          <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
-          <span className="text-[10px] font-black text-white uppercase tracking-[0.4em] italic">NORTH_LOCKED</span>
-        </div>
-        
-        <div className="space-y-4">
+      {/* CONTROALE NAVIGAȚIE */}
+      <div className="absolute right-6 top-1/2 -translate-y-1/2 flex flex-col gap-6">
+        <button 
+          onClick={() => mapRef.current?.easeTo({ bearing: 0, pitch: 0, duration: 1000 })}
+          className="bg-black/80 backdrop-blur-xl p-4 rounded-full border border-white/10 flex flex-col items-center shadow-2xl"
+        >
+          <span className="text-[12px] font-black text-blue-500 mb-1">N</span>
+          <Compass size={28} />
+        </button>
 
-          <div className="pt-2 border-t border-white/5 font-mono text-[9px] text-zinc-400">
+        <button 
+          onClick={handleRecenter}
+          className={`p-5 rounded-[2rem] border-2 transition-all shadow-2xl ${isFollowing ? 'bg-blue-600 border-white text-white scale-110 shadow-blue-500/50' : 'bg-black/80 border-white/10 text-zinc-500'}`}
+        >
+          <Crosshair size={32} />
+        </button>
+      </div>
+
+      {/* OVERLAY TACTIC UCAB */}
+      <div className="absolute top-6 left-6 p-5 bg-black/60 backdrop-blur-2xl border border-white/10 rounded-[2.2rem] shadow-2xl pointer-events-none">
+        <div className="flex items-center gap-3 mb-4">
+          <div className={`w-2.5 h-2.5 rounded-full ${isFollowing ? 'bg-blue-500 animate-pulse' : 'bg-yellow-500'}`} />
+          <span className="text-[10px] font-black text-white uppercase tracking-[0.4em] italic">
+            UCAB<span className="text-blue-600">.RO</span>_NAV
+          </span>
+        </div>
+        <div className="space-y-3">
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2 text-blue-400 font-black text-xs italic uppercase">
+               <Zap size={12} className="fill-blue-400" />
+               {isFollowing ? 'AUTO_FOLLOW' : 'MANUAL'}
+            </div>
+          </div>
+          <div className="pt-2 border-t border-white/5 flex flex-col font-mono text-[9px] text-zinc-400">
              {driverPos[1].toFixed(5)} N / {driverPos[0].toFixed(5)} E
           </div>
         </div>
