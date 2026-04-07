@@ -122,7 +122,9 @@ const [loading, setLoading] = useState(true);
   // ─── ACTIONS ──────────────────────────────────────────────────────────────
 
   // Actualizează status + timestamp corespunzător
-  const updateStatus = async (orderId, newStatus) => {
+// Înlocuiește linia 125 cu aceasta:
+const updateStatus = async (orderId: string, newStatus: string) => {
+
     const timestampField = {
       confirmed: "confirmed_at",
       preparing: "preparing_at",
