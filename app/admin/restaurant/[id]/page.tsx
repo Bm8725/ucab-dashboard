@@ -155,7 +155,8 @@ if (timestampField) {
     setCancelReason("");
   };
 
-  const toggleAvailability = async (itemId, currentStatus) => {
+const toggleAvailability = async (itemId: string, currentStatus: boolean) => {
+
     await supabase.from("menu_items")
       .update({ is_available: !currentStatus }).eq("id", itemId);
     setMenuItems(prev =>
