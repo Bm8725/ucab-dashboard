@@ -39,9 +39,8 @@ export default function RestaurantLiveDash() {
   const id = params.id;
 
   const [restaurant, setRestaurant] = useState(null);
-const [orders, setOrders] = useState<any[]>([]);
-const [menuItems, setMenuItems] = useState<any[]>([]);
-
+  const [orders, setOrders] = useState([]);
+  const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("orders");
   const [dateFilter, setDateFilter] = useState("today");
