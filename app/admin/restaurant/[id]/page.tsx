@@ -49,7 +49,8 @@ export default function RestaurantLiveDash() {
   const [cancelModal, setCancelModal] = useState(null); // order id
   const [cancelReason, setCancelReason] = useState("");
   const ordersPerPage = 6;
-  const audioRef = useRef(null);
+const audioRef = useRef<HTMLAudioElement | null>(null);
+
 
   // ─── INIT ─────────────────────────────────────────────────────────────────
   useEffect(() => {
