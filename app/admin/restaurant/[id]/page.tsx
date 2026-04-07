@@ -57,7 +57,7 @@ const audioRef = useRef<HTMLAudioElement | null>(null);
     audioRef.current = new Audio("/notify.wav");
     const unlockAudio = () => {
       audioRef.current?.play().then(() => {
-        audioRef.current.pause();
+           audioRef.current?.pause(); 
         audioRef.current.currentTime = 0;
       }).catch(() => {});
       window.removeEventListener("click", unlockAudio);
