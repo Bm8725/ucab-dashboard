@@ -49,19 +49,25 @@ export default function RestaurantLiveDash() {
   const [cancelModal, setCancelModal] = useState(null); // order id
   const [cancelReason, setCancelReason] = useState("");
   const ordersPerPage = 6;
-const audioRef = useRef<HTMLAudioElement | null>(null);
+ const audioRef = useRef<HTMLAudioElement | null>(null);
 
 
   // ─── INIT ─────────────────────────────────────────────────────────────────
-  useEffect(() => {
+    useEffect(() => {
     audioRef.current = new Audio("/notify.wav");
+    
     const unlockAudio = () => {
+      // Verificăm cu ? dacă play() poate fi apelat
       audioRef.current?.play().then(() => {
-           audioRef.current?.pause(); 
-        audioRef.current.currentTime = 0;
+        // CORECȚIE: Adăugat ? la pause() și verificare IF pentru currentTime
+        audioRef.current?.pause();
+        if (audioRef.current) {
+          audioRef.current.currentTime = 0;
+        }
       }).catch(() => {});
       window.removeEventListener("click", unlockAudio);
     };
+    
     window.addEventListener("click", unlockAudio);
 
     if (!id) return;
@@ -96,6 +102,7 @@ const audioRef = useRef<HTMLAudioElement | null>(null);
       }, (payload) => {
         if (payload.eventType === "INSERT") {
           setOrders(prev => [payload.new, ...prev]);
+          // CORECȚIE: Verificare sigură pentru play() la sunet nou
           audioRef.current?.play().catch(() => {});
         } else if (payload.eventType === "UPDATE") {
           setOrders(prev => prev.map(o => o.id === payload.new.id ? payload.new : o));
@@ -108,6 +115,7 @@ const audioRef = useRef<HTMLAudioElement | null>(null);
       window.removeEventListener("click", unlockAudio);
     };
   }, [id]);
+
 
   // ─── ACTIONS ──────────────────────────────────────────────────────────────
 
