@@ -39,7 +39,12 @@ export default function RestaurantLiveDash() {
   const id = params.id;
 
   const [restaurant, setRestaurant] = useState(null);
-  const [orders, setOrders] = useState([]);
+// Dacă ai o interfață definită:
+const [orders, setOrders] = useState<OrderType[]>([]);
+
+// Sau, varianta rapidă (dacă nu ai un tip definit încă):
+const [orders, setOrders] = useState<any[]>([]);
+
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("orders");
