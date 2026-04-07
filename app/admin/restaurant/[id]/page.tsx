@@ -134,8 +134,11 @@ const updateStatus = async (orderId: string, newStatus: string) => {
       cancelled: "cancelled_at",
     }[newStatus];
 
-    const updateData = { status: newStatus };
-    if (timestampField) updateData[timestampField] = new Date().toISOString();
+// Înlocuiește linia 137 și 138 cu acest bloc:
+const updateData: Record<string, any> = { status: newStatus };
+if (timestampField) {
+  updateData[timestampField] = new Date().toISOString();
+}
 
     await supabase.from("orders").update(updateData).eq("id", orderId);
     // Realtime va actualiza UI-ul automat
