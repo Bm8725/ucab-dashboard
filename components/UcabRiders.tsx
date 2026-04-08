@@ -164,54 +164,74 @@ export default function UcabRiders() {
                   </div>
                 </td>
               </tr>
-            ))}
-          </tbody>
-        </table>
+   lect 
+                        value={order.status} 
+                        onChange={(e) => updateOrderStatus(order.id, e.target.value)}
+                        className={`text-[9px] font-black border-2 px-4 py-3 rounded-2xl outline-none transition-all cursor-pointer uppercase tracking-widest shadow-lg ${getStatusColor(order.status)}`}
+                      >
+                        <option value="pending">PENDING</option>
+                        <option value="confirmed">CONFIRMED</option>
+                        <option value="assigned">ASSIGNED</option>
+                        <option value="preparing">PREPARING</option>
+                        <option value="ready">READY</option>
+                        <option value="picked_up">PICKED_UP</option>
+                        <option value="delivered">DELIVERED</option>
+                        <option value="cancelled">CANCELLED</option>
+                        <option value="failed">FAILED</option>
+                      </select>
+                      
+                      <div className="flex items-center gap-2 text-[8px] text-zinc-600 font-black">
+                        <Clock size={10} /> 
+                        {new Date(order.created_at).toLocaleDateString('ro-RO')} - {new Date(order.created_at).toLocaleTimeString('ro-RO', {hour: '2-digit', minute:'2-digit'})}
+                      </div>
+                      
+                      <button 
+                        onClick={() => deleteOrder(order.id)}
+                        className="opacity-0 group-hover:opacity-100 transition-all p-2 text-zinc-800 hover:text-red-600"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-        <div className="p-4 bg-[#141414] border-t border-[#222] flex justify-between items-center text-[10px] font-bold text-[#555] tracking-widest uppercase">
-          <div>Pagina {currentPage} / {totalPages || 1}</div>
-          <div className="flex gap-1">
-            <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="p-2 bg-[#1a1a1a] border border-[#222] rounded hover:border-[#ff007a] disabled:opacity-30 transition-all"><ChevronLeft size={14}/></button>
-            <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="p-2 bg-[#1a1a1a] border border-[#222] rounded hover:border-[#ff007a] disabled:opacity-30 transition-all"><ChevronRight size={14}/></button>
+        {/* PAGINATION CONTROL */}
+        <div className="p-8 bg-white/[0.01] border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="text-[10px] text-zinc-600 font-black tracking-widest">
+            SHOWING {currentItems.length} OF {filtered.length} ACTIVE_RECORDS
+          </div>
+          
+          <div className="flex items-center gap-3">
+             <button 
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
+                disabled={currentPage === 1}
+                className="p-4 bg-white/5 rounded-2xl hover:bg-red-600 transition-all disabled:opacity-10 disabled:hover:bg-white/5"
+             >
+                <ChevronLeft size={20}/>
+             </button>
+             
+             <div className="px-6 py-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black">
+                PAGE {currentPage} / {totalPages || 1}
+             </div>
+
+             <button 
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
+                disabled={currentPage === totalPages || totalPages === 0}
+                className="p-4 bg-white/5 rounded-2xl hover:bg-red-600 transition-all disabled:opacity-10 disabled:hover:bg-white/5"
+             >
+                <ChevronRight size={20}/>
+             </button>
           </div>
         </div>
       </div>
-
-      {(editingRider || isAdding) && (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <div className="bg-[#111] border border-[#222] w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row animate-in zoom-in duration-200">
-            {editingRider && (
-              <div className="w-full md:w-64 bg-[#0d0d0d] p-6 border-b md:border-b-0 md:border-r border-[#222]">
-                <h3 className="text-[#ff007a] text-[10px] font-black uppercase tracking-widest mb-6 flex items-center gap-2 italic"><History size={14}/> Security Log</h3>
-                <div className="space-y-4 text-[11px] text-[#444] font-medium uppercase tracking-tighter">
-                  <div className="p-3 bg-[#ff007a]/5 border border-[#ff007a]/20 rounded-lg text-[#ff007a] italic">
-                    <Info size={12} className="inline mr-1 mb-1"/> Înregistrat la: {new Date(editingRider.created_at).toLocaleDateString()}
-                  </div>
-                  <div className="flex items-center gap-2 pl-2 border-l border-[#222]">
-                    <Clock size={12} /> Status: Verified
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div className="flex-1 p-8">
-              <div className="flex justify-between items-start mb-8">
-                <h2 className="text-xl font-black text-white uppercase tracking-tighter">{isAdding ? 'Înregistrare Nouă' : 'Actualizare Cloud'}</h2>
-                <button onClick={() => {setEditingRider(null); setIsAdding(false);}} className="text-[#444] hover:text-[#ff007a] transition-colors"><X size={24} /></button>
-              </div>
-              
-              <form onSubmit={isAdding ? handleAdd : handleUpdate} className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-[#555] uppercase">Nume Rider</label>
-                  <input className="w-full p-3 bg-[#0a0a0a] border border-[#222] rounded-lg text-sm focus:border-[#ff007a] outline-none text-white transition-all" value={isAdding ? newRider.name : editingRider?.name} onChange={(e) => isAdding ? setNewRider({...newRider, name: e.target.value}) : setEditingRider({...editingRider!, name: e.target.value})} required />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-[#555] uppercase">Email</label>
-                  <input className="w-full p-3 bg-[#0a0a0a] border border-[#222] rounded-lg text-sm focus:border-[#ff007a] outline-none text-white transition-all" type="email" value={isAdding ? newRider.email : editingRider?.email} onChange={(e) => isAdding ? setNewRider({...newRider, email: e.target.value}) : setEditingRider({...editingRider!, email: e.target.value})} required />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-[#555] uppercase">Metodă Plată</label>
-                  <select className="w-full p-3 bg-[#0a0a0a] border border-[#222] rounded-lg text-sm focus:border-[#ff007a] outline-none text-white appearance-none" value={isAdding ? newRider.preferred_payment : editingRider?.preferred_payment || 'card'} onChange={(e) => isAdding ? setNewRider({...newRider, preferred_payment: e.target.value}) : setEditingRider({...editingRider!, preferred_payment: e.target.value})}>
+    </div>
+  );
+}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             lg text-sm focus:border-[#ff007a] outline-none text-white appearance-none" value={isAdding ? newRider.preferred_payment : editingRider?.preferred_payment || 'card'} onChange={(e) => isAdding ? setNewRider({...newRider, preferred_payment: e.target.value}) : setEditingRider({...editingRider!, preferred_payment: e.target.value})}>
                     <option value="card">CARD ONLINE</option>
                     <option value="cash">CASH / OFFLINE</option>
                   </select>

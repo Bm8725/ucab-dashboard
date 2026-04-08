@@ -10,20 +10,84 @@ import {
   Eye, EyeOff, Navigation, Timer, Bike, X
 } from "lucide-react";
 
+// ─── TIPURI ──────────────────────────────────────────────────────────────────
+interface OrderItem {
+  id?: string;
+  name: string;
+  price: number;
+  quantity: number;
+  image_url?: string;
+}
+
+interface Order {
+  id: string;
+  status: string;
+  created_at: string;
+  customer_name: string;
+  customer_phone: string;
+  delivery_address: string;
+  payment_method: string;
+  total_amount: number;
+  delivery_fee: number;
+  items: OrderItem[];
+  notes?: string;
+  restaurant_id: string;
+  driver_id?: string;
+  confirmed_at?: string;
+  preparing_at?: string;
+  ready_at?: string;
+  picked_up_at?: string;
+  delivered_at?: string;
+  cancelled_at?: string;
+  cancellation_reason?: string;
+}
+
+interface Restaurant {
+  id: string;
+  name: string;
+  image_url: string;
+  address: string;
+  orders_count?: number;
+}
+
+interface MenuItem {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  weight?: number;
+  image_url: string;
+  is_available: boolean;
+  restaurant_id: string;
+}
+
+interface StatusConfig {
+  label: string;
+  color: string;
+  badge: string;
+  dot: string;
+}
+
+interface RestaurantAction {
+  next: string;
+  label: string;
+  style: string;
+}
+
 // ─── STATUS CONFIG ───────────────────────────────────────────────────────────
-const STATUS_CONFIG = {
-  pending:    { label: "Nouă",       color: "border-red-600 bg-red-50",     badge: "bg-red-600 text-white",     dot: "bg-red-500" },
-  confirmed:  { label: "Confirmată", color: "border-orange-400 bg-orange-50", badge: "bg-orange-400 text-white", dot: "bg-orange-400" },
-  preparing:  { label: "Pregătire",  color: "border-yellow-400 bg-yellow-50", badge: "bg-yellow-400 text-black", dot: "bg-yellow-400" },
-  ready:      { label: "Gata",       color: "border-green-500 bg-green-50",  badge: "bg-green-500 text-white",   dot: "bg-green-500" },
-  picked_up:  { label: "Preluată",   color: "border-blue-500 bg-blue-50",    badge: "bg-blue-500 text-white",    dot: "bg-blue-500" },
-  delivered:  { label: "Livrată",    color: "border-zinc-200 bg-zinc-50",    badge: "bg-zinc-400 text-white",    dot: "bg-zinc-400" },
-  cancelled:  { label: "Anulată",    color: "border-zinc-100 bg-zinc-50",    badge: "bg-zinc-300 text-zinc-600", dot: "bg-zinc-300" },
+const STATUS_CONFIG: Record<string, StatusConfig> = {
+  pending:    { label: "Nouă",       color: "border-red-600 bg-red-50",       badge: "bg-red-600 text-white",     dot: "bg-red-500" },
+  confirmed:  { label: "Confirmată", color: "border-orange-400 bg-orange-50", badge: "bg-orange-400 text-white",  dot: "bg-orange-400" },
+  preparing:  { label: "Pregătire",  color: "border-yellow-400 bg-yellow-50", badge: "bg-yellow-400 text-black",  dot: "bg-yellow-400" },
+  ready:      { label: "Gata",       color: "border-green-500 bg-green-50",   badge: "bg-green-500 text-white",   dot: "bg-green-500" },
+  picked_up:  { label: "Preluată",   color: "border-blue-500 bg-blue-50",     badge: "bg-blue-500 text-white",    dot: "bg-blue-500" },
+  delivered:  { label: "Livrată",    color: "border-zinc-200 bg-zinc-50",     badge: "bg-zinc-400 text-white",    dot: "bg-zinc-400" },
+  cancelled:  { label: "Anulată",    color: "border-zinc-100 bg-zinc-50",     badge: "bg-zinc-300 text-zinc-600", dot: "bg-zinc-300" },
 };
 
 // Butoanele de acțiune pe care restaurantul le poate face
 // Driver-ul face picked_up → delivered, restaurantul nu atinge acele statusuri
-const RESTAURANT_ACTIONS = {
+const RESTAURANT_ACTIONS: Record<string, RestaurantAction | null> = {
   pending:   { next: "confirmed",  label: "✓ ACCEPTĂ COMANDA",  style: "bg-zinc-900 hover:bg-red-600 text-white" },
   confirmed: { next: "preparing",  label: "🍳 ÎNCEPE PREPARARE", style: "bg-orange-500 hover:bg-orange-600 text-white" },
   preparing: { next: "ready",      label: "✅ GATA DE LIVRARE",  style: "bg-green-600 hover:bg-green-700 text-white" },
@@ -36,32 +100,27 @@ const RESTAURANT_ACTIONS = {
 // ─── COMPONENT PRINCIPAL ─────────────────────────────────────────────────────
 export default function RestaurantLiveDash() {
   const params = useParams();
-  const id = params.id;
+  const id = params.id as string;
 
-  const [restaurant, setRestaurant] = useState(null);
-// Șterge orice altă definire anterioară a lui 'orders' sau 'menuItems'
-const [orders, setOrders] = useState<any[]>([]);
-const [menuItems, setMenuItems] = useState<any[]>([]); // Am adăugat <any[]> și aici
-const [loading, setLoading] = useState(true);
-
-  const [activeTab, setActiveTab] = useState("orders");
-  const [dateFilter, setDateFilter] = useState("today");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<"orders" | "menu">("orders");
+  const [dateFilter, setDateFilter] = useState<"today" | "yesterday" | "all">("today");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const [cancelModal, setCancelModal] = useState(null); // order id
+  const [cancelModal, setCancelModal] = useState<string | null>(null);
   const [cancelReason, setCancelReason] = useState("");
   const ordersPerPage = 6;
- const audioRef = useRef<HTMLAudioElement | null>(null);
-
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // ─── INIT ─────────────────────────────────────────────────────────────────
-    useEffect(() => {
+  useEffect(() => {
     audioRef.current = new Audio("/notify.wav");
-    
+
     const unlockAudio = () => {
-      // Verificăm cu ? dacă play() poate fi apelat
       audioRef.current?.play().then(() => {
-        // CORECȚIE: Adăugat ? la pause() și verificare IF pentru currentTime
         audioRef.current?.pause();
         if (audioRef.current) {
           audioRef.current.currentTime = 0;
@@ -69,7 +128,7 @@ const [loading, setLoading] = useState(true);
       }).catch(() => {});
       window.removeEventListener("click", unlockAudio);
     };
-    
+
     window.addEventListener("click", unlockAudio);
 
     if (!id) return;
@@ -101,13 +160,12 @@ const [loading, setLoading] = useState(true);
       .on("postgres_changes", {
         event: "*", schema: "public", table: "orders",
         filter: `restaurant_id=eq.${id}`,
-      }, (payload) => {
+      }, (payload: any) => {
         if (payload.eventType === "INSERT") {
-          setOrders(prev => [payload.new, ...prev]);
-          // CORECȚIE: Verificare sigură pentru play() la sunet nou
+          setOrders((prev: Order[]) => [payload.new, ...prev]);
           audioRef.current?.play().catch(() => {});
         } else if (payload.eventType === "UPDATE") {
-          setOrders(prev => prev.map(o => o.id === payload.new.id ? payload.new : o));
+          setOrders((prev: Order[]) => prev.map((o: Order) => o.id === payload.new.id ? payload.new : o));
         }
       })
       .subscribe();
@@ -118,27 +176,21 @@ const [loading, setLoading] = useState(true);
     };
   }, [id]);
 
-
   // ─── ACTIONS ──────────────────────────────────────────────────────────────
 
-  // Actualizează status + timestamp corespunzător
-// Înlocuiește linia 125 cu aceasta:
-const updateStatus = async (orderId: string, newStatus: string) => {
-
-    const timestampField = {
+  const updateStatus = async (orderId: string, newStatus: string) => {
+    const timestampMap: Record<string, string> = {
       confirmed: "confirmed_at",
       preparing: "preparing_at",
       ready:     "ready_at",
       picked_up: "picked_up_at",
       delivered: "delivered_at",
       cancelled: "cancelled_at",
-    }[newStatus];
+    };
 
-// Înlocuiește linia 137 și 138 cu acest bloc:
-const updateData: Record<string, any> = { status: newStatus };
-if (timestampField) {
-  updateData[timestampField] = new Date().toISOString();
-}
+    const timestampField = timestampMap[newStatus];
+    const updateData: Record<string, string> = { status: newStatus };
+    if (timestampField) updateData[timestampField] = new Date().toISOString();
 
     await supabase.from("orders").update(updateData).eq("id", orderId);
     // Realtime va actualiza UI-ul automat
@@ -155,16 +207,15 @@ if (timestampField) {
     setCancelReason("");
   };
 
-const toggleAvailability = async (itemId: string, currentStatus: boolean) => {
-
+  const toggleAvailability = async (itemId: string, currentStatus: boolean) => {
     await supabase.from("menu_items")
       .update({ is_available: !currentStatus }).eq("id", itemId);
-    setMenuItems(prev =>
-      prev.map(i => i.id === itemId ? { ...i, is_available: !currentStatus } : i)
+    setMenuItems((prev: MenuItem[]) =>
+      prev.map((i: MenuItem) => i.id === itemId ? { ...i, is_available: !currentStatus } : i)
     );
   };
 
-  const printReceipt = (order) => {
+  const printReceipt = (order: Order) => {
     const iframe = document.createElement("iframe");
     iframe.style.display = "none";
     document.body.appendChild(iframe);
@@ -185,7 +236,7 @@ const toggleAvailability = async (itemId: string, currentStatus: boolean) => {
             <strong>PLATĂ:</strong> ${order.payment_method?.toUpperCase()}
           </div>
           <div style="border-bottom:1px solid #000;margin-bottom:10px;"></div>
-          ${order.items?.map(i => `
+          ${order.items?.map((i: OrderItem) => `
             <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;">
               <span>${i.quantity}x ${i.name}</span>
               <span>${i.price} RON</span>
@@ -193,7 +244,7 @@ const toggleAvailability = async (itemId: string, currentStatus: boolean) => {
           `).join("")}
           <div style="border-top:2px dashed #000;margin-top:10px;padding-top:10px;">
             <div style="display:flex;justify-content:space-between;font-size:12px;">
-              <span>Subtotal</span><span>${(order.total_amount - (order.delivery_fee||0)).toFixed(2)} RON</span>
+              <span>Subtotal</span><span>${(order.total_amount - (order.delivery_fee || 0)).toFixed(2)} RON</span>
             </div>
             <div style="display:flex;justify-content:space-between;font-size:12px;">
               <span>Livrare</span><span>${order.delivery_fee || 0} RON</span>
@@ -220,7 +271,7 @@ const toggleAvailability = async (itemId: string, currentStatus: boolean) => {
     const yesterday = today - 86400000;
 
     return orders
-      .filter(o => {
+      .filter((o: Order) => {
         const oDate = new Date(o.created_at).getTime();
         const dateOk =
           dateFilter === "today" ? oDate >= today :
@@ -229,8 +280,8 @@ const toggleAvailability = async (itemId: string, currentStatus: boolean) => {
         const statusOk = statusFilter === "all" || o.status === statusFilter;
         return dateOk && statusOk;
       })
-      .sort((a, b) => {
-        const priority = { pending: 0, confirmed: 1, preparing: 2, ready: 3, picked_up: 4, delivered: 5, cancelled: 6 };
+      .sort((a: Order, b: Order) => {
+        const priority: Record<string, number> = { pending: 0, confirmed: 1, preparing: 2, ready: 3, picked_up: 4, delivered: 5, cancelled: 6 };
         if (priority[a.status] !== priority[b.status]) return priority[a.status] - priority[b.status];
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       });
@@ -241,7 +292,7 @@ const toggleAvailability = async (itemId: string, currentStatus: boolean) => {
   );
   const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
 
-  const formatDate = (ds) => {
+  const formatDate = (ds: string) => {
     const d = new Date(ds);
     return {
       time: d.toLocaleTimeString("ro-RO", { hour: "2-digit", minute: "2-digit" }),
@@ -249,7 +300,7 @@ const toggleAvailability = async (itemId: string, currentStatus: boolean) => {
     };
   };
 
-  const activeCount = orders.filter(o =>
+  const activeCount = orders.filter((o: Order) =>
     ["pending", "confirmed", "preparing", "ready"].includes(o.status)
   ).length;
 
@@ -291,10 +342,10 @@ const toggleAvailability = async (itemId: string, currentStatus: boolean) => {
             <p className="text-4xl md:text-6xl text-red-600 font-black tracking-tighter">{activeCount}</p>
           </div>
           <div className="text-center">
-            <p className="text-[8px] text-zinc-400 mb-1 tracking-widests">REVENUE</p>
+            <p className="text-[8px] text-zinc-400 mb-1 tracking-widest">REVENUE</p>
             <p className="text-4xl md:text-6xl font-black tracking-tighter">
-              {orders.filter(o => o.status === "delivered")
-                .reduce((a, c) => a + Number(c.total_amount), 0).toFixed(0)}
+              {orders.filter((o: Order) => o.status === "delivered")
+                .reduce((a: number, c: Order) => a + Number(c.total_amount), 0).toFixed(0)}
             </p>
           </div>
         </div>
@@ -317,8 +368,8 @@ const toggleAvailability = async (itemId: string, currentStatus: boolean) => {
           <div className="flex flex-wrap gap-3">
             {/* Filtru dată */}
             <div className="flex bg-white p-2 rounded-2xl shadow-lg border border-zinc-100">
-              {[["today", "Azi"], ["yesterday", "Ieri"], ["all", "Toate"]].map(([f, label]) => (
-                <button key={f} onClick={() => { setDateFilter(f); setCurrentPage(1); }}
+              {([["today", "Azi"], ["yesterday", "Ieri"], ["all", "Toate"]] as [string, string][]).map(([f, label]) => (
+                <button key={f} onClick={() => { setDateFilter(f as "today" | "yesterday" | "all"); setCurrentPage(1); }}
                   className={`px-4 py-2 rounded-xl text-[9px] tracking-widest transition-all ${dateFilter === f ? "bg-red-600 text-white" : "text-zinc-300 hover:text-red-600"}`}>
                   {label}
                 </button>
@@ -326,7 +377,7 @@ const toggleAvailability = async (itemId: string, currentStatus: boolean) => {
             </div>
             {/* Filtru status */}
             <div className="flex bg-white p-2 rounded-2xl shadow-lg border border-zinc-100 flex-wrap gap-1">
-              {[["all", "Toate"], ["pending", "Noi"], ["confirmed", "Conf."], ["preparing", "Prep."], ["ready", "Gata"], ["delivered", "Livrate"]].map(([s, label]) => (
+              {([["all", "Toate"], ["pending", "Noi"], ["confirmed", "Conf."], ["preparing", "Prep."], ["ready", "Gata"], ["delivered", "Livrate"]] as [string, string][]).map(([s, label]) => (
                 <button key={s} onClick={() => { setStatusFilter(s); setCurrentPage(1); }}
                   className={`px-3 py-2 rounded-xl text-[9px] tracking-widest transition-all ${statusFilter === s ? "bg-zinc-900 text-white" : "text-zinc-300 hover:text-zinc-600"}`}>
                   {label}
@@ -342,7 +393,7 @@ const toggleAvailability = async (itemId: string, currentStatus: boolean) => {
         <AnimatePresence mode="wait">
           {activeTab === "orders" ? (
             <motion.div key="orders" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-12">
-              
+
               {currentOrders.length === 0 && (
                 <div className="text-center py-20 text-zinc-300 text-sm tracking-widest">
                   Nicio comandă pentru filtrele selectate
@@ -350,7 +401,7 @@ const toggleAvailability = async (itemId: string, currentStatus: boolean) => {
               )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {currentOrders.map((order) => {
+                {currentOrders.map((order: Order) => {
                   const cfg = STATUS_CONFIG[order.status] || STATUS_CONFIG.pending;
                   const action = RESTAURANT_ACTIONS[order.status];
                   const { time, day } = formatDate(order.created_at);
@@ -407,7 +458,7 @@ const toggleAvailability = async (itemId: string, currentStatus: boolean) => {
 
                       {/* Produse */}
                       <div className="space-y-2 mb-6 border-y-2 border-zinc-50 py-4 max-h-36 overflow-y-auto">
-                        {order.items?.map((item, i) => (
+                        {order.items?.map((item: OrderItem, i: number) => (
                           <div key={i} className="flex justify-between text-[11px] font-black tracking-tight">
                             <span className="text-red-600">{item.quantity}x</span>
                             <span className="flex-1 px-2 text-zinc-700">{item.name}</span>
@@ -434,7 +485,6 @@ const toggleAvailability = async (itemId: string, currentStatus: boolean) => {
                             </p>
                           )}
                         </div>
-                        {/* Status livrat / preluat de driver */}
                         {order.status === "ready" && (
                           <div className="text-[9px] text-green-600 font-black tracking-widest flex items-center gap-1">
                             <Bike size={14} /> Așteptăm driver
@@ -462,7 +512,6 @@ const toggleAvailability = async (itemId: string, currentStatus: boolean) => {
                             {action.label}
                           </button>
                         )}
-                        {/* Buton anulare — doar pentru pending/confirmed */}
                         {["pending", "confirmed"].includes(order.status) && (
                           <button
                             onClick={() => setCancelModal(order.id)}
@@ -480,7 +529,7 @@ const toggleAvailability = async (itemId: string, currentStatus: boolean) => {
               {/* PAGINARE */}
               {totalPages > 1 && (
                 <div className="flex justify-center items-center gap-6 py-12">
-                  <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)}
+                  <button disabled={currentPage === 1} onClick={() => setCurrentPage((p: number) => p - 1)}
                     className="p-4 bg-white rounded-2xl shadow-xl border border-zinc-100 text-red-600 disabled:opacity-20 active:scale-95 transition-all">
                     <ChevronLeft size={24} strokeWidth={3} />
                   </button>
@@ -488,7 +537,7 @@ const toggleAvailability = async (itemId: string, currentStatus: boolean) => {
                     <span className="text-[10px] text-zinc-300 tracking-widest block uppercase">PAGINA</span>
                     <span className="text-xl font-black text-zinc-900">{currentPage} / {totalPages}</span>
                   </div>
-                  <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)}
+                  <button disabled={currentPage === totalPages} onClick={() => setCurrentPage((p: number) => p + 1)}
                     className="p-4 bg-white rounded-2xl shadow-xl border border-zinc-100 text-red-600 disabled:opacity-20 active:scale-95 transition-all">
                     <ChevronRight size={24} strokeWidth={3} />
                   </button>
@@ -511,7 +560,7 @@ const toggleAvailability = async (itemId: string, currentStatus: boolean) => {
                       </tr>
                     </thead>
                     <tbody>
-                      {menuItems.map((item) => (
+                      {menuItems.map((item: MenuItem) => (
                         <tr key={item.id} className={`border-b transition-all ${!item.is_available ? "bg-red-50/20" : "hover:bg-zinc-50"}`}>
                           <td className="p-8">
                             <div className="flex items-center gap-6">
@@ -562,7 +611,7 @@ const toggleAvailability = async (itemId: string, currentStatus: boolean) => {
                 placeholder="Motiv anulare (opțional)..."
                 className="w-full p-5 border rounded-2xl font-bold h-28 outline-none focus:ring-4 ring-red-50 border-gray-200 resize-none normal-case italic text-sm mb-6"
                 value={cancelReason}
-                onChange={e => setCancelReason(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setCancelReason(e.target.value)}
               />
               <div className="grid grid-cols-2 gap-3">
                 <button onClick={() => setCancelModal(null)}
