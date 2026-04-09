@@ -242,6 +242,9 @@ const [isVerified, setIsVerified] = useState(false);
               {canAccess('ride') && (
                 <NavItem icon={<Car size={20}/>} label="Drivers" active={activeTab === "ride"} onClick={() => {setActiveTab("ride"); setIsMenuOpen(false);}} activeColor="text-blue-500" />
               )}
+              {canAccess('users') && (
+                <NavItem icon={<Users size={20}/>} label="Users" active={activeTab === "users"} onClick={() => {setActiveTab("users"); setIsMenuOpen(false);}} activeColor="text-pink-500" />
+              )}
               {canAccess('status') && (
                 <NavItem icon={<Activity size={20}/>} label="Status" active={activeTab === "status"} onClick={() => {setActiveTab("status"); setIsMenuOpen(false);}} activeColor="text-purple-500" />
               )}
