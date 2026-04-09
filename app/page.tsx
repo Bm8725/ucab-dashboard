@@ -12,7 +12,7 @@ import UcabGlobal from "@/components/UcabGlobal";
 import { 
   Utensils, Car, Truck, LayoutGrid, Zap, 
   Menu, X, Settings, ShieldCheck, LogIn, Loader2,
-MessageCircle, Users, Bell, Info, Activity 
+MessageCircle, Users, Bell, Info, Activity , ChevronRight 
 } from "lucide-react";
 
 export default function UcabSuperDash() {
@@ -21,7 +21,9 @@ export default function UcabSuperDash() {
   const [isLogged, setIsLogged] = useState(false);
   const [userRole, setUserRole] = useState<"ADMIN" | "FOOD" | "SHARE" | null>(null);
   const [mounted, setMounted] = useState(false);
-  
+  // ADAUGĂ ACEASTĂ LINIE LÂNGĂ CELELALTE STATE-URI (SUS ÎN COD)
+const [isVerified, setIsVerified] = useState(false);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
@@ -90,7 +92,7 @@ export default function UcabSuperDash() {
   // --- COLOANE PERMISE ---
   const canAccess = (tabId: string) => {
     if (userRole === 'ADMIN') return true;
-    if (userRole === 'FOOD') return ['food', 'livrator', 'status', 'chat', 'settings'].includes(tabId);
+    if (userRole === 'FOOD') return ['food', 'livrator', 'status', 'chat', 'settings','users'].includes(tabId);
     if (userRole === 'SHARE') return ['ride', 'users', 'chat', 'settings'].includes(tabId);
     return false;
   };
@@ -109,43 +111,109 @@ export default function UcabSuperDash() {
   const cur = themes[activeTab] || themes.global;
 
   // --- ECRAN LOGIN ---
+  // --- ECRAN LOGIN GLASSMORPHISM + ANTI-BOT ---
   if (!isLogged) {
     return (
-      <div className="min-h-screen bg-[#020202] flex items-center justify-center p-6 italic uppercase font-sans">
-        <div className="w-full max-w-md bg-[#080808] border border-white/5 p-10 rounded-[3rem] shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-1 bg-emerald-500"></div>
-          <div className="flex flex-col items-center mb-10 text-center">
-            <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-6 overflow-hidden shadow-xl shadow-emerald-500/10">
+      <div className="min-h-screen flex items-center justify-center p-6 font-sans relative overflow-hidden bg-slate-950 italic uppercase">
+        
+        {/* IMAGINE DE FUNDAL CU OVERLAY */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="/ucab2.png" 
+            alt="Background" 
+            className="w-full h-full object-cover scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-black/90 via-slate-900/70 to-black/90 backdrop-blur-[3px]"></div>
+        </div>
+
+        <div className="w-full max-w-md bg-white/[0.06] backdrop-blur-[30px] border border-white/10 p-10 rounded-[3rem] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] relative z-10">
+          
+          <div className="flex flex-col items-center mb-8 text-center">
+            <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center mb-6 border border-white/20 shadow-2xl">
               <img src="/ucabro.png" alt="Logo" className="w-10 h-10 object-contain" />
             </div>
-            <h1 className="text-2xl font-black text-white tracking-tighter italic">UCAB MANAGEMENT</h1>
-            <p className="text-[9px] text-zinc-500 mt-2 tracking-widest">Nexus Authorization Terminal</p>
+            <h1 className="text-xl font-black text-white tracking-tighter">
+              UCAB.ro <span className="font-light text-white/50">Admin</span>
+            </h1>
+            <p className="text-[8px] text-emerald-400 mt-2 font-bold tracking-[0.3em] opacity-70">
+              Authorized Personnel Only
+            </p>
           </div>
+
           <div className="space-y-4">
             <input 
               type="email" 
-              placeholder="EMAIL ACCESS" 
+              placeholder="manager@ucab.ro" 
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-white/5 border border-white/5 p-5 rounded-2xl outline-none focus:border-emerald-500/50 transition-all text-white font-bold" 
+              className="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-emerald-500/50 transition-all text-white font-bold text-xs placeholder:text-white/20" 
             />
+            
             <input 
               type="password" 
-              placeholder="PASSWORD" 
+              placeholder="access_key" 
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-white/5 border border-white/5 p-5 rounded-2xl outline-none focus:border-emerald-500/50 transition-all text-white font-bold" 
+              className="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-emerald-500/50 transition-all text-white font-bold text-xs placeholder:text-white/20" 
             />
+
+            {/* ANTI-BOT SLIDER */}
+            <div className="relative h-12 bg-white/5 border border-white/10 rounded-2xl mt-6 overflow-hidden flex items-center group">
+                <input 
+                    type="range" 
+                    min="0" 
+                    max="100" 
+                    value={isVerified ? 100 : undefined}
+                    onChange={(e) => { if(e.target.value === "100") setIsVerified(true); }}
+                    className={`absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20 ${isVerified ? 'pointer-events-none' : ''}`}
+                />
+                <div 
+                    className="absolute left-1 top-1 bottom-1 bg-emerald-500 rounded-xl transition-all duration-300 flex items-center justify-center shadow-lg shadow-emerald-500/20"
+                    style={{ width: isVerified ? 'calc(100% - 8px)' : '40px' }}
+                >
+                    {isVerified ? (
+                        <ShieldCheck size={18} className="text-black" />
+                    ) : (
+                        <ChevronRight size={18} className="text-black animate-pulse" />
+                    )}
+                </div>
+                <p className={`w-full text-center text-[9px] font-black tracking-widest transition-opacity duration-500 ${isVerified ? 'opacity-0' : 'opacity-30'}`}>
+                    Slide to unlock
+                </p>
+            </div>
+
             <button 
               onClick={handleLogin} 
-              disabled={authLoading}
-              className="w-full py-5 bg-white text-black font-black text-xs tracking-widest rounded-2xl hover:bg-emerald-500 hover:text-white transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+              disabled={authLoading || !isVerified}
+              className={`w-full py-4.5 font-black text-[10px] tracking-widest rounded-2xl transition-all flex items-center justify-center gap-2 mt-2 shadow-xl
+                ${isVerified 
+                    ? 'bg-white text-black hover:bg-emerald-500 hover:text-white cursor-pointer' 
+                    : 'bg-white/5 text-white/20 cursor-not-allowed border border-white/5'}
+              `}
             >
-               {authLoading ? <Loader2 className="animate-spin" /> : "ENTER CONSOLE"}
+               {authLoading ? (
+                 <Loader2 className="animate-spin" size={16} />
+               ) : (
+                 <>
+                   <span>Initialize Access</span>
+                   <ChevronRight size={14} />
+                 </>
+               )}
             </button>
           </div>
+
+          <div className="mt-8 pt-6 border-t border-white/5 flex justify-between items-center opacity-30">
+         
+            <div className="text-[7px] font-white tracking-widest">  V {APP_DASH_VERSION}</div>
+          </div>
         </div>
+
+        {/* GLOW DECOR */}
+        <div className="absolute top-1/3 -left-20 w-80 h-80 bg-emerald-500/10 rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-1/3 -right-20 w-80 h-80 bg-blue-500/10 rounded-full blur-[120px]"></div>
       </div>
     );
   }
+
+
 
   return (
     <div className="min-h-screen bg-[#020202] text-zinc-400 font-sans italic uppercase">
@@ -183,7 +251,7 @@ export default function UcabSuperDash() {
             </nav>
 
             <button onClick={handleLogout} className="mt-auto flex items-center gap-4 px-6 py-4 text-zinc-600 hover:text-white transition-all font-black text-[10px] tracking-widest">
-                <LogIn size={20} className="rotate-180" /> EXIT SYSTEM
+                <LogIn size={20} className="rotate-180" /> EXIT DASHBOARD
             </button>
           </div>
         </aside>
@@ -200,6 +268,7 @@ export default function UcabSuperDash() {
             {activeTab === "food" && canAccess('food') && <UcabFood />}
             {activeTab === "ride" && canAccess('ride') && <UcabRide />}
             {activeTab === "livrator" && canAccess('livrator') && <UcabLivrators />}
+            {activeTab === "users" && canAccess('users') && <UcabRiders />}
             {activeTab === "status" && canAccess('status') && <UcabStatusDelivery />}
             {activeTab === "chat" && canAccess('chat') && <UcabChatAdmin />}
           </div>
