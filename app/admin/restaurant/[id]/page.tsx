@@ -316,7 +316,7 @@ export default function RestaurantLiveDash() {
       {/* HEADER */}
       <div className="flex items-center gap-2 mb-6">
         <img src="/ucabfood.png" alt="Logo" style={{ width: "32px", height: "32px", objectFit: "contain" }} />
-        <span className="text-[12px] tracking-[0.4em] uppercase text-zinc-400">UVAB.RO / UVAB FOOD ROMANIA</span>
+        <span className="text-[12px] tracking-[0.4em] uppercase text-zinc-400">UCAB.RO / UCAB FOOD ROMANIA</span>
       </div>
 
       <header className="max-w-7xl w-full mx-auto flex flex-col lg:flex-row justify-between items-center mb-10 bg-white p-8 md:p-10 rounded-[3rem] shadow-2xl border-4 border-red-600 gap-8">
@@ -324,7 +324,7 @@ export default function RestaurantLiveDash() {
           <img src={restaurant?.image_url} className="w-24 h-24 md:w-32 md:h-32 rounded-[2.5rem] object-cover shadow-xl ring-4 ring-[#FDFCF7]" alt="" />
           <div>
             <h1 className="text-4xl md:text-6xl lg:text-8xl tracking-tighter leading-none mb-2 uppercase">
-              UVAB <span className="text-red-600">FOOD</span>
+              UCAB <span className="text-red-600">FOOD</span>
             </h1>
             <p className="text-xl md:text-2xl text-zinc-800 leading-none font-black">{restaurant?.name}</p>
             <p className="text-[9px] text-red-600 tracking-[0.2em] mt-2 flex items-center justify-center md:justify-start gap-2 italic">
@@ -517,7 +517,7 @@ export default function RestaurantLiveDash() {
                             onClick={() => setCancelModal(order.id)}
                             className="w-full py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest border-2 border-red-200 text-red-400 hover:bg-red-600 hover:text-white hover:border-red-600 transition-all"
                           >
-                            ✕ ANULEAZĂ
+                            ✕ ANULEAZĂ/CANCEL
                           </button>
                         )}
                       </div>
